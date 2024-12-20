@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">NFCDemo</string>
+    <string name="title_activity_nfcactivity">NFCActivity</string>
 </resources>
