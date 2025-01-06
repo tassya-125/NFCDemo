@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activity.LoginActivity">
+    tools:context=".activity.LoginActivity">
 
     <ImageView
         android:id="@+id/logo"
@@ -17,64 +17,11 @@
         android:background="@drawable/logo"
         />
 
-    <EditText
-        android:id="@+id/userName"
-        android:layout_width="@dimen/login_editText_width"
-        android:layout_height="@dimen/login_editText_height"
-        app:layout_constraintTop_toBottomOf="@id/logo"
+    <androidx.viewpager2.widget.ViewPager2
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:hint="@string/username_hint"
-        android:textColor="@android:color/black"
-        android:textColorHint="@android:color/black"
-        android:paddingStart="@dimen/editText_paddingLeft"
-        android:layout_marginTop="@dimen/height_gap"
-        android:background="@drawable/search_round"
-        tools:ignore="RtlSymmetry" />
-    <ImageView
-        android:id="@+id/user_logo"
-        android:layout_width="@dimen/icon_size"
-        android:layout_height="@dimen/icon_size"
-        android:background="@drawable/user"
-        app:layout_constraintLeft_toLeftOf="@+id/userName"
-        app:layout_constraintTop_toTopOf="@+id/userName"
-        app:layout_constraintBottom_toBottomOf="@+id/userName"
-        android:layout_marginStart="@dimen/icon_margin_left"
-        />
-
-    <EditText
-        android:id="@+id/password"
-        android:layout_width="@dimen/login_editText_width"
-        android:layout_height="@dimen/login_editText_height"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userName"
-        android:textColor="@android:color/black"
-        android:textColorHint="@android:color/black"
-        android:hint="@string/password_hint"
-        android:paddingLeft="@dimen/editText_paddingLeft"
-        android:background="@drawable/search_round"
-        android:layout_marginTop="@dimen/height_gap_betweenEditText"
-        />
-    <ImageView
-        android:id="@+id/password_logo"
-        android:layout_width="@dimen/icon_size"
-        android:layout_height="@dimen/icon_size"
-        app:layout_constraintLeft_toLeftOf="@+id/password"
-        app:layout_constraintTop_toTopOf="@+id/password"
-        app:layout_constraintBottom_toBottomOf="@+id/password"
-        android:layout_marginStart="@dimen/icon_margin_left"
-        android:background="@drawable/password"
-        />
-    <Button
-        android:id="@+id/login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/password"
-        app:layout_constraintLeft_toLeftOf="@+id/password"
-        app:layout_constraintRight_toRightOf="@+id/password"
-        android:text="@string/login"
-        android:layout_marginTop="@dimen/height_gap"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/logo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

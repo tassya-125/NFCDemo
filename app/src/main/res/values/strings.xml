@@ -5,5 +5,9 @@
     <string name="username_hint">请输入用户名</string>
     <string name="password_hint">请输入密码</string>
     <string name="login">登录</string>
+    <!--     注册相关字符资源    -->
     <string name="register">注册</string>
+    <string name="phone_hint">请输入手机号码</string>
+    <string name="email_hint">请输入邮箱</string>
+
 </resources>

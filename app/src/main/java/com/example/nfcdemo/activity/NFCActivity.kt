@@ -1,4 +1,4 @@
-package com.example.nfcdemo.Activity
+package com.example.nfcdemo.activity
 
 
 import android.app.PendingIntent
