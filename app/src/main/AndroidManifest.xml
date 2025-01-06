@@ -13,10 +13,10 @@
         android:theme="@style/Theme.NFCDemo"
         tools:targetApi="31">
         <activity
-            android:name=".Activity.LoginActivity"
+            android:name=".activity.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".Activity.NFCActivity"
+            android:name=".activity.NFCActivity"
             android:exported="false"
             android:label="@string/title_activity_nfcactivity"
             android:launchMode="singleTop"
