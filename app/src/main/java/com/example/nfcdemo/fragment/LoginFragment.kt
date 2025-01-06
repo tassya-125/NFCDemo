@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import com.example.nfcdemo.R
 
 
-class loginFragment : Fragment() {
+class LoginFragment : Fragment() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +19,8 @@ class loginFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_login, container, false)
+        val view  =  inflater.inflate(R.layout.fragment_login, container, false)
+        return view
     }
 
 

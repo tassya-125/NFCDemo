@@ -65,6 +65,7 @@
         app:layout_constraintRight_toRightOf="@+id/password"
         android:text="@string/login"
         android:layout_marginTop="@dimen/height_gap"
+        android:background="@drawable/login_button_round"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

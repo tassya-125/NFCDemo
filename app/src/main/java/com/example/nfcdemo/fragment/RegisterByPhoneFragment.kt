@@ -17,6 +17,7 @@ class RegisterByPhoneFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_registe_by_phone, container, false)
+         val view= inflater.inflate(R.layout.fragment_registe_by_phone, container, false)
+        return view
     }
 }

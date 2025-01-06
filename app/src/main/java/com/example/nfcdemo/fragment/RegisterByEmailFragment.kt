@@ -17,7 +17,9 @@ public class RegisterByEmailFragment : Fragment(){
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_register_by_email, container, false)
+
+        val view = inflater.inflate(R.layout.fragment_register_by_email, container, false)
+        return view
     }
 
 }
