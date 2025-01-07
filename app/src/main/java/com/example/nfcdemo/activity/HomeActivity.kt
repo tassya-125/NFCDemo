@@ -8,6 +8,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.example.nfcdemo.R
 import com.example.nfcdemo.adapter.LoginAdapter
+import com.example.nfcdemo.fragment.BuyRecordFragment
+import com.example.nfcdemo.fragment.CheckHistoryFragment
 import com.example.nfcdemo.fragment.HomeFragment
 import com.example.nfcdemo.fragment.LoginFragment
 import com.example.nfcdemo.fragment.MainFragment
@@ -17,7 +19,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
 class HomeActivity : AppCompatActivity() {
-    val tabs =  listOf("主页","我的")
+    val tabs =  listOf("主页","购买记录","验证历史","我的")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -32,7 +34,7 @@ class HomeActivity : AppCompatActivity() {
         val viewPager2 = findViewById<ViewPager2>(R.id.viewpager)
         val tabLayout = findViewById<TabLayout>(R.id.tab_layout)
 
-        val fragments = listOf(MainFragment(), HomeFragment())
+        val fragments = listOf(MainFragment(),BuyRecordFragment() ,CheckHistoryFragment(),HomeFragment())
         val adapter = LoginAdapter(this,fragments)
 
         viewPager2.adapter = adapter
