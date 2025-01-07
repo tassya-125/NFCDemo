@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="login_editText_height">60dp</dimen>
-    <dimen name="login_editText_width">280dp</dimen>
+    <dimen name="login_editText_height">50dp</dimen>
+    <dimen name="login_editText_width">260dp</dimen>
     <dimen name="icon_size">30dp</dimen>
     <dimen name="icon_margin_left">10dp</dimen>
     <dimen name="editText_paddingLeft">40dp</dimen>
-    <dimen name="height_gap">40dp</dimen>
-    <dimen name="height_gap_betweenEditText">25dp</dimen>
+    <dimen name="height_gap">20dp</dimen>
+    <dimen name="height_gap_betweenEditText">15dp</dimen>
     <dimen name="login_width">300dp</dimen>
 </resources>

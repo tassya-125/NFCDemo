@@ -5,8 +5,9 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.LoginActivity">
-
+    tools:context=".activity.LoginActivity"
+    android:background="@color/simple_blue"
+    >
     <ImageView
         android:id="@+id/logo"
         android:layout_width="wrap_content"
@@ -16,13 +17,25 @@
         app:layout_constraintTop_toTopOf="parent"
         android:background="@drawable/logo"
         />
+    <TextView
+        android:id="@+id/background"
+        app:layout_constraintTop_toTopOf="@+id/logo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_width="@dimen/login_width"
+        android:layout_height="280dp"
+        android:background="@drawable/login_background_round"
+        />
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="@dimen/login_width"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logo"
+        app:layout_constraintTop_toTopOf="@+id/background"
+        app:layout_constraintBottom_toTopOf="@+id/viewpager"
         app:tabIndicatorColor="@android:color/holo_blue_light"
         app:tabSelectedTextColor="@android:color/holo_blue_light"
         app:tabIndicatorHeight="4dp"
@@ -35,6 +48,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tab_layout"
+        app:layout_constraintBottom_toBottomOf="@+id/background"
         android:layout_width="@dimen/login_width"
         android:layout_height="wrap_content"
         />
