@@ -5,38 +5,31 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.LoginActivity">
+    tools:context=".activity.HomeActivity">
 
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewpager"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/logo"
+        app:layout_constraintBottom_toTopOf="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         />
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
-        android:layout_width="@dimen/login_width"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/viewpager"
         app:tabIndicatorColor="@android:color/holo_blue_light"
         app:tabSelectedTextColor="@android:color/holo_blue_light"
         app:tabIndicatorHeight="4dp"
         app:tabMode="fixed"
         app:tabGravity="fill"
         android:background="@android:color/holo_blue_light" />
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewpager"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tab_layout"
-        android:layout_width="@dimen/login_width"
-        android:layout_height="wrap_content"
-        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
