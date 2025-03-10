@@ -8,6 +8,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.example.nfcdemo.R
 import com.example.nfcdemo.adapter.LoginAdapter
+import com.example.nfcdemo.databinding.ActivityHomeBinding
 import com.example.nfcdemo.fragment.BuyRecordFragment
 import com.example.nfcdemo.fragment.CheckHistoryFragment
 import com.example.nfcdemo.fragment.HomeFragment
@@ -20,9 +21,12 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class HomeActivity : AppCompatActivity() {
     val tabs =  listOf("主页","购买记录","验证历史","我的")
+
+    lateinit var binding : ActivityHomeBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_home)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

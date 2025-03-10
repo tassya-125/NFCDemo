@@ -2,6 +2,7 @@ package com.example.nfcdemo.util
 
 import com.google.gson.Gson
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 
 class OkhttpUtil private constructor() {
 
@@ -52,7 +53,7 @@ class OkhttpUtil private constructor() {
         // 使用 Gson 将 Map 转换为 JSON 字符串
         val json = Gson().toJson(params)
 
-        val mediaType = MediaType.parse("application/json; charset=utf-8")
+        val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
         val requestBody = RequestBody.create(mediaType, json)
 
         val request = Request.Builder()
