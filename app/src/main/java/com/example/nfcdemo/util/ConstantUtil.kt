@@ -4,6 +4,6 @@ class ConstantUtil {
     companion object {
         const val PAGE_USER = 0
         const val PAGE_HOME = 1
-        const val PAGE_SETTINGS = 2
+        const val PAGE_SEARCH = 2
     }
 }

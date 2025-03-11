@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,7 +30,7 @@ class MainCompose {
     @Preview
     @Composable
     fun MainScreen() {
-        var currentPage by remember { mutableStateOf(ConstantUtil.PAGE_USER) }
+        var currentPage by remember { mutableStateOf(ConstantUtil.PAGE_SEARCH) }
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -43,8 +43,8 @@ class MainCompose {
             Box(modifier = Modifier.padding(paddingValues)) {
                 when (currentPage) {
                     ConstantUtil.PAGE_USER -> UserScreen()
-                    ConstantUtil.PAGE_HOME -> HomeScreen()
-                    ConstantUtil.PAGE_SETTINGS -> SettingsScreen()
+                    ConstantUtil.PAGE_HOME -> NFCCheckScreen()
+                    ConstantUtil.PAGE_SEARCH -> SearchScreen()
                 }
             }
         }
@@ -60,10 +60,10 @@ class MainCompose {
                 onClick = { onPageSelected(ConstantUtil.PAGE_HOME) }
             )
             NavigationBarItem(
-                icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-                label = { Text("设置") },
-                selected = currentPage == ConstantUtil.PAGE_SETTINGS,
-                onClick = { onPageSelected(ConstantUtil.PAGE_SETTINGS) }
+                icon = { Icon(Icons.Default.Search, contentDescription = "SEARCH") },
+                label = { Text("搜索") },
+                selected = currentPage == ConstantUtil.PAGE_SEARCH,
+                onClick = { onPageSelected(ConstantUtil.PAGE_SEARCH) }
             )
             NavigationBarItem(
                 icon = { Icon(Icons.Default.Person, contentDescription = "User") },
@@ -74,15 +74,10 @@ class MainCompose {
         }
     }
 
-    @Composable
-    fun HomeScreen() {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = "主页", fontSize = 24.sp)
-        }
-    }
+
 
     @Composable
-    fun SettingsScreen() {
+    fun SEARCHScreen() {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(text = "设置页面", fontSize = 24.sp)
         }
