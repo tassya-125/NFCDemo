@@ -111,7 +111,6 @@ class NFCActivity : AppCompatActivity()  {
                 try {
                     nfcA.connect() // 连接到 NFC 标签
 
-
                     // 获取 NFC 标签的 UID（唯一标识符）
                     val uid = nfcA.tag.id
                     val uidHex = bytesToHex(uid)

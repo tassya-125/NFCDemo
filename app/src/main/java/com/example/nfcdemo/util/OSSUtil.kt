@@ -7,7 +7,7 @@ import java.util.UUID
 
 
 
-class OSSUtil {
+object OSSUtil {
 
 
 }
