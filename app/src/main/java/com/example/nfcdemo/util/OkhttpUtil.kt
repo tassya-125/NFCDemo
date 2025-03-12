@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 
-class OkhttpUtil private constructor() {
+object OkhttpUtil  {
 
     // OkHttpClient 实例
     val okHttpClient: OkHttpClient
@@ -15,26 +15,6 @@ class OkhttpUtil private constructor() {
     // 初始化代码
     init {
         okHttpClient = OkHttpClient.Builder().build()
-    }
-
-    // 单例对象
-    companion object {
-        @Volatile
-        private var instance: OkhttpUtil? = null
-
-        fun getInstance(): OkhttpUtil {
-            var tempInstance = instance
-            if (tempInstance == null) {
-                synchronized(this) {
-                    tempInstance = instance
-                    if (tempInstance == null) {
-                        instance = OkhttpUtil()
-                        tempInstance = instance
-                    }
-                }
-            }
-            return tempInstance!!
-        }
     }
 
     // GET 方法
@@ -48,6 +28,24 @@ class OkhttpUtil private constructor() {
 
     // POST 方法，接收 Map 数据并将其转换为 JSON 字符串
     fun post(endpoint: String, params: Map<String, Any>, callback: Callback) {
+        val url = baseUrl + endpoint
+
+        // 使用 Gson 将 Map 转换为 JSON 字符串
+        val json = Gson().toJson(params)
+
+        val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
+        val requestBody = RequestBody.create(mediaType, json)
+
+        val request = Request.Builder()
+            .url(url)
+            .post(requestBody)
+            .build()
+
+        okHttpClient.newCall(request).enqueue(callback)
+    }
+
+    // POST 方法，接收 Map 数据并将其转换为 JSON 字符串
+    fun post(endpoint: String, params: Any, callback: Callback) {
         val url = baseUrl + endpoint
 
         // 使用 Gson 将 Map 转换为 JSON 字符串

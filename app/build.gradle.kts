@@ -41,7 +41,7 @@ android {
         viewBinding=true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.11"
     }
     packaging {
         resources {
@@ -51,13 +51,13 @@ android {
 }
 
 dependencies {
+    implementation(libs.oss.android.sdk)
     implementation(libs.coil.compose)
     implementation (libs.gson)
     implementation  (libs.okhttp.v3147)
     implementation (libs.okio)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.lifecycle.runtime.ktx)
