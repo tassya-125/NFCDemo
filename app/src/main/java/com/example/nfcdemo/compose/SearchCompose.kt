@@ -48,10 +48,10 @@ fun SearchScreen() {
                     .border(1.dp, Color.Blue, RoundedCornerShape(8.dp)),
                 placeholder = { Text("Please input", color = Color.Gray) },
                 shape = RoundedCornerShape(8.dp),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor =  Color(0xFFE3F2FD), // 设置聚焦时边框颜色为浅蓝色
-                    unfocusedBorderColor = Color(0xFF1E88E5) // 设置未聚焦时边框颜色为白色// 设置未聚焦时边框颜色
-                )
+//                colors = TextFieldDefaults.outlinedTextFieldColors(
+//                    focusedBorderColor =  Color(0xFFE3F2FD), // 设置聚焦时边框颜色为浅蓝色
+//                    unfocusedBorderColor = Color(0xFF1E88E5) // 设置未聚焦时边框颜色为白色// 设置未聚焦时边框颜色
+//                )
             )
             Spacer(modifier = Modifier.width(8.dp))
             Button(

@@ -38,7 +38,7 @@ import com.example.nfcdemo.util.ConstantUtil
     @Preview
     @Composable
     fun MainScreen() {
-        var currentPage by remember { mutableStateOf(ConstantUtil.PAGE_USER) }
+        var currentPage by remember { mutableStateOf(2) }
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
