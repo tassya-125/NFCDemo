@@ -71,17 +71,25 @@ fun UserProfileScreen() {
 
     fun checkAndRequestPermissions() {
         val cameraPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-        val storagePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)
+        val storagePermission = if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
+            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)
+        } else {
+            PackageManager.PERMISSION_GRANTED  // Android 10+ 直接返回已授予状态
+        }
 
-        if (cameraPermission == PackageManager.PERMISSION_GRANTED &&
-            storagePermission == PackageManager.PERMISSION_GRANTED) {
+        if (cameraPermission == PackageManager.PERMISSION_GRANTED && storagePermission == PackageManager.PERMISSION_GRANTED) {
             showDialog = true
         } else {
             requestPermissionsLauncher.launch(
-                arrayOf(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE)
+                if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
+                    arrayOf(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE)
+                } else {
+                    arrayOf(Manifest.permission.CAMERA) // Android 10+ 仅请求 CAMERA
+                }
             )
         }
     }
+
 
     Column(
         modifier = Modifier

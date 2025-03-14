@@ -22,7 +22,6 @@ class NFCActivity : AppCompatActivity()  {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_nfc)
 
         // 获取 NFC 适配器
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
@@ -41,8 +40,7 @@ class NFCActivity : AppCompatActivity()  {
             return
         }
 
-        // 设置显示 NFC 数据的 TextView
-        nfcDataTextView = findViewById<TextView>(R.id.nfcDataTextView)
+
     }
 
     override fun onResume() {
