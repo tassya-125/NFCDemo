@@ -1,9 +1,11 @@
 package com.example.nfcdemo.compose
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -14,18 +16,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 
 
-    @Composable
+@Composable
     fun LoginRegisterScreen() {
-        var isLogin by remember { mutableStateOf(true) }
+        var isLogin by remember { mutableStateOf(false) }
         var isUsingPhone by remember { mutableStateOf(true) }
-
+        var countdown by remember { mutableStateOf(0) }
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -50,7 +54,7 @@ import androidx.compose.ui.unit.sp
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = if (isUsingPhone) "使用邮箱登录" else "使用手机号登录",
+                    (if (isUsingPhone) "使用邮箱" else "使用手机号") + (if (isLogin) "登录" else "注册"),
                     color = Color(0xFF2196F3),
                     modifier = Modifier.clickable { isUsingPhone = !isUsingPhone }
                 )
@@ -61,6 +65,11 @@ import androidx.compose.ui.unit.sp
                     label = if (isUsingPhone) "请输入手机号" else "请输入邮箱",
                     icon = if (isUsingPhone) Icons.Default.Phone else Icons.Default.Email
                 )
+
+                if (!isLogin ) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    VerificationCodeRow()
+                }
 
                 PasswordField()
 
@@ -111,6 +120,56 @@ import androidx.compose.ui.unit.sp
             modifier = Modifier.fillMaxWidth()
         )
     }
+
+@Composable
+fun VerificationCodeRow() {
+    var code by remember { mutableStateOf("") }
+    var isCountingDown by remember { mutableStateOf(false) }
+    var countdownTime by remember { mutableStateOf(60) }
+
+    // 倒计时逻辑
+    LaunchedEffect(isCountingDown) {
+        if (isCountingDown) {
+            while (countdownTime > 0) {
+                delay(1000L)
+                countdownTime--
+            }
+            isCountingDown = false
+            countdownTime = 60
+        }
+    }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // 验证码输入框
+        OutlinedTextField(
+            value = code,
+            onValueChange = { code = it },
+            label = { Text("输入验证码") },
+            modifier = Modifier.weight(1f)
+        )
+
+        // 发送验证码按钮
+        Button(
+            onClick = {
+                // 处理发送验证码的逻辑
+                isCountingDown = true
+            },
+            enabled = !isCountingDown,
+            shape = RectangleShape, // 设置为无圆角矩形
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
+            modifier = Modifier.height(56.dp).absolutePadding(top = 5.dp) // 确保按钮与输入框高度一致
+
+        ) {
+            Text(
+                text = if (isCountingDown) "$countdownTime 秒后重试" else "发送验证码"
+            )
+        }
+    }
+}
 
     @Preview
     @Composable
