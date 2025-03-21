@@ -18,7 +18,7 @@ class AuthViewModel(
     sealed class AuthState {
         object Idle : AuthState()
         object Loading : AuthState()
-        data class LoginSuccess(val user: User, val token: String) : AuthState()
+        data class LoginSuccess(val token: String) : AuthState()
         data class RegisterSuccess(val user: User, val token: String) : AuthState()
         object CodeSentSuccess : AuthState()
         data class Error(val message: String, val type: OperationType) : AuthState()
@@ -35,10 +35,7 @@ class AuthViewModel(
         executeAuthOperation(
             operationType = OperationType.LOGIN,
             action = { repository.login(identifier, password) },
-            successHandler = { response ->
-                validateAuthResponse(response)?.let { (user, token) ->
-                    AuthState.LoginSuccess(user, token)
-                } ?: AuthState.Error("Invalid login data", OperationType.LOGIN)
+            successHandler = { response -> AuthState.LoginSuccess(response.token)
             }
         )
     }
@@ -76,16 +73,13 @@ class AuthViewModel(
                 val result = action()
                 result.fold(
                     onSuccess = { data ->
-                        Log.e("Auth",operationType.toString()+result.toString())
                         _authState.value = successHandler(data)
-
                     },
                     onFailure = { exception ->
                         _authState.value = AuthState.Error(
                             message = parseErrorMessage(exception, operationType),
                             type = operationType
                         )
-                        Log.e("Auth",operationType.toString()+result.toString())
                     }
                 )
             } catch (e: Exception) {

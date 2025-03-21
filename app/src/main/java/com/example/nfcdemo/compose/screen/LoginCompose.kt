@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nfcdemo.compose.components.AuthInputField
 import com.example.nfcdemo.compose.components.PasswordInputField
 import com.example.nfcdemo.compose.components.VerificationCodeRow
@@ -25,92 +26,105 @@ import com.example.nfcdemo.viewmodel.AuthViewModel
 
 
 @Composable
-fun LoginRegisterScreen() {
-        var authViewModel :AuthViewModel = AuthViewModel()
-        var identifier  by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
-        var isLogin by remember { mutableStateOf(true) }
-        var isUsingPhone by remember { mutableStateOf(true) }
-        var code by remember { mutableStateOf("") }
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFFF5F5F5)),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(24.dp)
-                    .shadow(8.dp, RoundedCornerShape(16.dp))
-                    .background(Color.White, RoundedCornerShape(16.dp))
-                    .padding(32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = if (isLogin) "登录" else "注册",
-                    fontSize = 32.sp,
-                    color = Color.Black
-                )
+fun LoginRegisterScreen(onLoginSuccess: () -> Unit) {
+    var authViewModel : AuthViewModel = viewModel()
+    val authState by authViewModel.authState.collectAsState()
+    var identifier  by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var isLogin by remember { mutableStateOf(true) }
+    var isUsingPhone by remember { mutableStateOf(true) }
+    var code by remember { mutableStateOf("") }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = if(!isLogin) ((if (isUsingPhone) "使用邮箱" else "使用手机号") + "注册") else "",
-                    color = Color(0xFF2196F3),
-                    modifier = Modifier.clickable { isUsingPhone = !isUsingPhone }
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                AuthInputField(
-                    label = if(isLogin)  "用户名/手机号/邮箱" else if (isUsingPhone) "手机号" else "邮箱",
-                    icon = if (isUsingPhone) Icons.Default.Phone else Icons.Default.Email,
-                    value =   identifier   ,
-                    onValueChange= {newValue ->
-                        identifier = newValue
-                    }
-                )
-
-                if (!isLogin ) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    VerificationCodeRow(code=code){
-                        newValue->code= newValue
-                    }
-                }
-
-                PasswordInputField(password = password) { newValue -> password = newValue }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = {
-                        if(isLogin){
-                            Log.e("Auth","Login")
-                            authViewModel.login(identifier,password)
-                        }else{
-                            authViewModel.register(identifier,password,code,isUsingPhone)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3))
-                ) {
-                    Text(text = if (isLogin) "登录" else "注册", fontSize = 18.sp, color = Color.White)
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = if (isLogin) "没有账号？立即注册" else "已有账号？立即登录",
-                    color = Color(0xFF2196F3),
-                    modifier = Modifier.clickable { isLogin = !isLogin }
-                )
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthViewModel.AuthState.LoginSuccess -> {
+                Log.e("auth","login成功")
+                onLoginSuccess()
+            }
+            else -> {
+                Log.e("auth","login失败")
             }
         }
     }
 
-    @Preview
-    @Composable
-    fun PreviewLoginRegisterScreen() {
-        LoginRegisterScreen()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(24.dp)
+                .shadow(8.dp, RoundedCornerShape(16.dp))
+                .background(Color.White, RoundedCornerShape(16.dp))
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = if (isLogin) "登录" else "注册",
+                fontSize = 32.sp,
+                color = Color.Black
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = if(!isLogin) ((if (isUsingPhone) "使用邮箱" else "使用手机号") + "注册") else "",
+                color = Color(0xFF2196F3),
+                modifier = Modifier.clickable { isUsingPhone = !isUsingPhone }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            AuthInputField(
+                label = if(isLogin)  "用户名/手机号/邮箱" else if (isUsingPhone) "手机号" else "邮箱",
+                icon = if (isUsingPhone) Icons.Default.Phone else Icons.Default.Email,
+                value =   identifier   ,
+                onValueChange= {newValue ->
+                    identifier = newValue
+                }
+            )
+
+            if (!isLogin ) {
+                Spacer(modifier = Modifier.height(8.dp))
+                VerificationCodeRow(code=code){
+                        newValue->code= newValue
+                }
+            }
+
+            PasswordInputField(password = password) { newValue -> password = newValue }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    if(isLogin){
+                        authViewModel.login(identifier,password)
+                    }else{
+                        authViewModel.register(identifier,password,code,isUsingPhone)
+                    }
+
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3))
+            ) {
+                Text(text = if (isLogin) "登录" else "注册", fontSize = 18.sp, color = Color.White)
+            }
+            Text(
+                text = "Current State: ${authState::class.simpleName}" + "current : ${authViewModel.authState.value}",
+                modifier = Modifier.background(Color.LightGray)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = if (isLogin) "没有账号？立即注册" else "已有账号？立即登录",
+                color = Color(0xFF2196F3),
+                modifier = Modifier.clickable { isLogin = !isLogin }
+            )
+        }
     }
+}
+

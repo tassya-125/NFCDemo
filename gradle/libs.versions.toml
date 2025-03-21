@@ -22,6 +22,8 @@ okhttpVersion = "3.14.7"
 okio = "2.8.0"
 ossAndroidSdk = "2.9.13"
 retrofit = "2.9.0"
+kotlinGradlePluginVersion = "1.9.23"
+navigationCompose = "2.8.9"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -52,6 +54,8 @@ okhttp-v3147 = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttpVe
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 oss-android-sdk = { module = "com.aliyun.dpa:oss-android-sdk", version.ref = "ossAndroidSdk" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+jetbrains-kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlinGradlePluginVersion" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
