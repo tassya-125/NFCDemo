@@ -35,7 +35,10 @@ class AuthViewModel(
         executeAuthOperation(
             operationType = OperationType.LOGIN,
             action = { repository.login(identifier, password) },
-            successHandler = { response -> AuthState.LoginSuccess(response.token)
+            successHandler = { response ->
+                validateAuthResponse(response)?.let { (user, token) ->
+                    AuthState.RegisterSuccess(user, token)
+                } ?: AuthState.Error("Invalid registration data", OperationType.LOGIN)
             }
         )
     }

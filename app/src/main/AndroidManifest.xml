@@ -13,10 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NFCDemo"
         android:usesCleartextTraffic="true"
+        android:name=".MyApp"
         tools:targetApi="31">
-        <activity
-            android:name=".activity.LoginActivity"
-            android:exported="false" />
         <activity
             android:name=".activity.NFCActivity"
             android:exported="false"
@@ -36,7 +34,6 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
@@ -49,7 +46,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

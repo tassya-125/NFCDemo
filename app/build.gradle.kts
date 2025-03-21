@@ -51,6 +51,7 @@ android {
 }
 
 dependencies {
+    implementation (libs.mmkv)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
