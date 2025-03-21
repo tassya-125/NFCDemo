@@ -18,7 +18,7 @@ class AuthViewModel(
     sealed class AuthState {
         object Idle : AuthState()
         object Loading : AuthState()
-        data class LoginSuccess(val token: String) : AuthState()
+        data class LoginSuccess(val user:User,val token: String) : AuthState()
         data class RegisterSuccess(val user: User, val token: String) : AuthState()
         object CodeSentSuccess : AuthState()
         data class Error(val message: String, val type: OperationType) : AuthState()
@@ -35,7 +35,10 @@ class AuthViewModel(
         executeAuthOperation(
             operationType = OperationType.LOGIN,
             action = { repository.login(identifier, password) },
-            successHandler = { response -> AuthState.LoginSuccess(response.token)
+            successHandler = { response ->
+                validateAuthResponse(response)?.let { (user, token) ->
+                    AuthState.LoginSuccess(user, token)
+                } ?: AuthState.Error("Invalid registration data", OperationType.LOGIN)
             }
         )
     }
@@ -87,7 +90,6 @@ class AuthViewModel(
                     message = "Network error: ${e.message ?: "Unknown error"}",
                     type = operationType
                 )
-                Log.e("Auth",operationType.toString()+e.toString())
             }
         }
     }

@@ -5,20 +5,20 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.nfcdemo.compose.MainScreen
+import com.example.nfcdemo.util.UserManager
 
 sealed class Screen(val route: String) {
     object Auth : Screen("auth")
     object Home : Screen("home")
-    object Profile : Screen("profile")
 }
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-
+    val startDestination= if (UserManager.isLoggedIn()) Screen.Home.route else Screen.Auth.route
     NavHost(
         navController = navController,
-        startDestination = Screen.Auth.route
+        startDestination = startDestination
     ) {
         composable(Screen.Auth.route) {
             LoginRegisterScreen(
@@ -31,6 +31,8 @@ fun AppNavigation() {
                 }
             )
         }
-        composable(Screen.Home.route) { MainScreen() }
+        composable(Screen.Home.route) {
+            MainScreen()
+        }
     }
 }

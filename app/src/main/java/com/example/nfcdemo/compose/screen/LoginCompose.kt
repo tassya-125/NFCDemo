@@ -38,11 +38,11 @@ fun LoginRegisterScreen(onLoginSuccess: () -> Unit) {
     LaunchedEffect(authState) {
         when (authState) {
             is AuthViewModel.AuthState.LoginSuccess -> {
-                Log.e("auth","login成功")
+                Log.e("auth","login成功 222")
                 onLoginSuccess()
             }
             else -> {
-                Log.e("auth","login失败")
+                Log.e("auth","login失败 111")
             }
         }
     }
@@ -105,6 +105,7 @@ fun LoginRegisterScreen(onLoginSuccess: () -> Unit) {
                     }else{
                         authViewModel.register(identifier,password,code,isUsingPhone)
                     }
+                    Log.e("auth","status : ${authViewModel.authState.value}")
 
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -112,10 +113,6 @@ fun LoginRegisterScreen(onLoginSuccess: () -> Unit) {
             ) {
                 Text(text = if (isLogin) "登录" else "注册", fontSize = 18.sp, color = Color.White)
             }
-            Text(
-                text = "Current State: ${authState::class.simpleName}" + "current : ${authViewModel.authState.value}",
-                modifier = Modifier.background(Color.LightGray)
-            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
