@@ -6,248 +6,426 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImage
+import com.example.nfcdemo.R
 
+
+@Preview
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileScreen() {
     val context = LocalContext.current
-
     var avatarUri by remember { mutableStateOf<Uri?>(null) }
-    var showDialog by remember { mutableStateOf(false) }
-    var username by remember { mutableStateOf("John Doe") }
-    var phoneNumber by remember { mutableStateOf("123-456-7890") }
-    var email by remember { mutableStateOf("johndoe@example.com") }
+    var showImageSourceDialog by remember { mutableStateOf(false) }
     var isEditing by remember { mutableStateOf(false) }
 
-    val pickImageLauncher = rememberLauncherForActivityResult(
+    val (username, setUsername) = remember { mutableStateOf("John Doe") }
+    val (phoneNumber, setPhoneNumber) = remember { mutableStateOf("+1 234 567 890") }
+    val (email, setEmail) = remember { mutableStateOf("johndoe@example.com") }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null) avatarUri = uri
-    }
+    ) { uri: Uri? -> uri?.let { avatarUri = it } }
 
-    val takePictureLauncher = rememberLauncherForActivityResult(
+    val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap: Bitmap? ->
-        if (bitmap != null) {
-            avatarUri = saveImageToGallery(context, bitmap)
-        }
-    }
+    ) { bitmap: Bitmap? -> bitmap?.let { avatarUri = saveImageToGallery(context, it) } }
 
-    val requestPermissionsLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        val granted = permissions[Manifest.permission.CAMERA] == true &&
-                permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true
-        if (granted) {
-            showDialog = true
-        } else {
-            Log.e("Permission", "用户拒绝权限")
+        when {
+            permissions[Manifest.permission.CAMERA] == true -> showImageSourceDialog = true
+            else -> {/* 处理权限拒绝 */}
         }
     }
 
-    fun checkAndRequestPermissions() {
-        val cameraPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-        val storagePermission = if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
-            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)
-        } else {
-            PackageManager.PERMISSION_GRANTED  // Android 10+ 直接返回已授予状态
+    fun checkPermissions() {
+        val requiredPermissions = arrayListOf(Manifest.permission.CAMERA)
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
+            requiredPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
 
-        if (cameraPermission == PackageManager.PERMISSION_GRANTED && storagePermission == PackageManager.PERMISSION_GRANTED) {
-            showDialog = true
+        if (requiredPermissions.all {
+                ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+            }) {
+            showImageSourceDialog = true
         } else {
-            requestPermissionsLauncher.launch(
-                if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.Q) {
-                    arrayOf(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE)
-                } else {
-                    arrayOf(Manifest.permission.CAMERA) // Android 10+ 仅请求 CAMERA
-                }
+            permissionLauncher.launch(requiredPermissions.toTypedArray())
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(stringResource(R.string.profile_title)) },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+                )
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(padding)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // 头像部分
+            ProfileAvatarSection(
+                avatarUri = avatarUri,
+                onEditClick = { checkPermissions() }
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // 信息卡片
+            ProfileInfoCard(
+                isEditing = isEditing,
+                username = username,
+                phoneNumber = phoneNumber,
+                email = email,
+                onUsernameChange = setUsername,
+                onPhoneChange = setPhoneNumber,
+                onEmailChange = setEmail,
+                onEditToggle = { isEditing = !isEditing }
+            )
+        }
+
+        // 图片来源对话框
+        if (showImageSourceDialog) {
+            ImageSourceSelectionDialog(
+                onDismiss = { showImageSourceDialog = false },
+                onGallerySelect = { galleryLauncher.launch("image/*") },
+                onCameraSelect = { cameraLauncher.launch(null) }
             )
         }
     }
+}
 
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+@Composable
+private fun ProfileAvatarSection(
+    avatarUri: Uri?,
+    onEditClick: () -> Unit
+) {
+    Box(
+        contentAlignment = Alignment.BottomEnd,
+        modifier = Modifier.size(160.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            tonalElevation = 6.dp,
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(onClick = onEditClick)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .background(Color.Gray)
-                    .clickable { checkAndRequestPermissions() }
-            ) {
-                if (avatarUri != null) {
-                    Image(
-                        painter = rememberImagePainter(avatarUri),
-                        contentDescription = "User Avatar",
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Default Avatar",
-                        modifier = Modifier.fillMaxSize(),
-                        tint = Color.White
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            IconButton(
-                onClick = { checkAndRequestPermissions() },
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(Color.Gray, CircleShape)
-            ) {
+            if (avatarUri != null) {
+                AsyncImage(
+                    model = avatarUri,
+                    contentDescription = stringResource(R.string.profile_avatar_desc),
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
                 Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Upload Avatar",
-                    tint = Color.White
+                    imageVector = Icons.Outlined.Person,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(32.dp)
+                        .fillMaxSize(),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(50.dp))
-
-        if (isEditing) {
-            UserInputField(value = username, label = "用户名") { username = it }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            UserInputField(value = phoneNumber, label = "手机号") { phoneNumber = it }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            UserInputField(value = email, label = "邮箱") { email = it }
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                Button(
-                    onClick = { isEditing = false },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF81D4FA)),
-                    shape = RoundedCornerShape(10.dp)
-                ) {
-                    Text("保存", color = Color.White)
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Button(
-                    onClick = { isEditing = false },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
-                    shape = RoundedCornerShape(10.dp)
-                ) {
-                    Text("取消", color = Color.White)
-                }
-            }
-        } else {
-            UserInfoDisplay(label = "当前用户名：$username")
-            Spacer(modifier = Modifier.height(16.dp))
-
-            UserInfoDisplay(label = "当前手机号：$phoneNumber")
-            Spacer(modifier = Modifier.height(16.dp))
-
-            UserInfoDisplay(label = "当前邮箱：$email")
-
-            Spacer(modifier = Modifier.height(60.dp))
-
-            Button(
-                onClick = { isEditing = true },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF81D4FA)),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Text("编辑信息", color = Color.White)
-            }
-        }
-
-        if (showDialog) {
-            AlertDialog(
-                onDismissRequest = { showDialog = false },
-                title = { Text("选择头像") },
-                text = { Text("请选择照片来源") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        showDialog = false
-                        pickImageLauncher.launch("image/*")
-                    }) { Text("从相册选择") }
-                },
-                dismissButton = {
-                    TextButton(onClick = {
-                        showDialog = false
-                        takePictureLauncher.launch(null)
-                    }) { Text("拍照") }
-                }
+        // 编辑按钮
+        IconButton(
+            onClick = onEditClick,
+            modifier = Modifier
+                .size(48.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = CircleShape
+                )
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Edit,
+                contentDescription = stringResource(R.string.edit_avatar),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
     }
 }
 
-fun saveImageToGallery(context: Context, bitmap: Bitmap): Uri? {
-    val uri = MediaStore.Images.Media.insertImage(
-        context.contentResolver,
-        bitmap,
-        "Avatar",
-        "User Profile Picture"
-    )
-    return Uri.parse(uri)
-}
-
 @Composable
-fun UserInfoDisplay(label: String) {
-    Text(
-        text = label,
-        style = TextStyle(fontSize = 16.sp),
-        modifier = Modifier.padding(vertical = 4.dp)
-    )
+private fun ProfileInfoCard(
+    isEditing: Boolean,
+    username: String,
+    phoneNumber: String,
+    email: String,
+    onUsernameChange: (String) -> Unit,
+    onPhoneChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onEditToggle: () -> Unit
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
+        elevation = CardDefaults.cardElevation(4.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            if (isEditing) {
+                ProfileEditableFields(
+                    username = username,
+                    phoneNumber = phoneNumber,
+                    email = email,
+                    onUsernameChange = onUsernameChange,
+                    onPhoneChange = onPhoneChange,
+                    onEmailChange = onEmailChange
+                )
+                ProfileActionButtons(
+                    onSave = onEditToggle,
+                    onCancel = onEditToggle
+                )
+            } else {
+                ProfileInfoDisplay(
+                    username = username,
+                    phoneNumber = phoneNumber,
+                    email = email
+                )
+                Button(
+                    onClick = onEditToggle,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.edit_profile),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserInputField(value: String, label: String, onValueChange: (String) -> Unit) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
+private fun ProfileEditableFields(
+    username: String,
+    phoneNumber: String,
+    email: String,
+    onUsernameChange: (String) -> Unit,
+    onPhoneChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        OutlinedTextField(
+            value = username,
+            onValueChange = onUsernameChange,
+            label = { Text(stringResource(R.string.username)) },
+            leadingIcon = { Icon(Icons.Outlined.Person, null) },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        )
+
+        OutlinedTextField(
+            value = phoneNumber,
+            onValueChange = onPhoneChange,
+            label = { Text(stringResource(R.string.phone)) },
+            leadingIcon = { Icon(Icons.Outlined.Phone, null) },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        )
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = onEmailChange,
+            label = { Text(stringResource(R.string.email)) },
+            leadingIcon = { Icon(Icons.Outlined.Email, null) },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        )
+    }
+}
+
+@Composable
+private fun ProfileActionButtons(
+    onSave: () -> Unit,
+    onCancel: () -> Unit
+) {
+    Row(
         modifier = Modifier.fillMaxWidth(),
-        singleLine = true
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        OutlinedButton(
+            onClick = onCancel,
+            modifier = Modifier.weight(1f),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text(stringResource(R.string.cancel))
+        }
+
+        Button(
+            onClick = onSave,
+            modifier = Modifier.weight(1f),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text(stringResource(R.string.save))
+        }
+    }
+}
+
+@Composable
+private fun ProfileInfoDisplay(
+    username: String,
+    phoneNumber: String,
+    email: String
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
+        InfoListItem(
+            icon = Icons.Outlined.Person,
+            label = stringResource(R.string.username),
+            value = username
+        )
+
+        Divider(
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+            thickness = 1.dp
+        )
+
+        InfoListItem(
+            icon = Icons.Outlined.Phone,
+            label = stringResource(R.string.phone),
+            value = phoneNumber
+        )
+
+        Divider(
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+            thickness = 1.dp
+        )
+
+        InfoListItem(
+            icon = Icons.Outlined.Email,
+            label = stringResource(R.string.email),
+            value = email
+        )
+    }
+}
+
+@Composable
+private fun InfoListItem(
+    icon: ImageVector,
+    label: String,
+    value: String
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(24.dp)
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Column {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
+@Composable
+private fun ImageSourceSelectionDialog(
+    onDismiss: () -> Unit,
+    onGallerySelect: () -> Unit,
+    onCameraSelect: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+
+        icon = { Icon(Icons.Default.CheckCircle, null) },
+        title = { Text(stringResource(R.string.choose_image_source)) },
+        text = { Text(stringResource(R.string.select_image_source_prompt)) },
+        confirmButton = {
+            TextButton(onClick = {
+                onGallerySelect()
+                onDismiss()
+            }) {
+                Text(stringResource(R.string.gallery))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = {
+                onCameraSelect()
+                onDismiss()
+            }) {
+                Text(stringResource(R.string.camera))
+            }
+        }
     )
 }
 
-@Preview
-@Composable
-fun PreviewUserProfileScreen() {
-    UserProfileScreen()
+private fun saveImageToGallery(context: Context, bitmap: Bitmap): Uri? {
+    return MediaStore.Images.Media.insertImage(
+        context.contentResolver,
+        bitmap,
+        "Profile_${System.currentTimeMillis()}",
+        "User profile picture"
+    )?.let { Uri.parse(it) }
 }
+
+

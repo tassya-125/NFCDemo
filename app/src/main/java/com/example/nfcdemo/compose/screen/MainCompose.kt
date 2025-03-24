@@ -1,4 +1,4 @@
-package com.example.nfcdemo.compose
+package com.example.nfcdemo.compose.screen
 
 
 
@@ -31,6 +31,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.nfcdemo.compose.SearchScreen
+import com.example.nfcdemo.compose.UserProfileScreen
 import com.example.nfcdemo.util.ConstantUtil
 
 
