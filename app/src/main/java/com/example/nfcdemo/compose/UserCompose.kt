@@ -245,7 +245,6 @@ private fun ProfileInfoCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProfileEditableFields(
     username: String,

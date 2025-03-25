@@ -38,11 +38,9 @@ fun LoginRegisterScreen(onLoginSuccess: () -> Unit) {
     LaunchedEffect(authState) {
         when (authState) {
             is AuthViewModel.AuthState.LoginSuccess -> {
-                Log.e("auth","login成功 222")
                 onLoginSuccess()
             }
             else -> {
-                Log.e("auth","login失败 111")
             }
         }
     }

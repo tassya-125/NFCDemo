@@ -1,5 +1,7 @@
 package com.example.nfcdemo.compose.screen
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -23,12 +25,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import com.example.nfcdemo.MainActivity
 import com.example.nfcdemo.R
 import com.example.nfcdemo.compose.components.LoadingIndicator
+import com.example.nfcdemo.util.NFCUtil
+import kotlin.math.log
 
 @Composable
-fun NFCCheckScreen() {
+fun NFCCheckScreen(activity: MainActivity) {
     val infiniteTransition = rememberInfiniteTransition(label = "")
     val rotation by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -38,7 +44,6 @@ fun NFCCheckScreen() {
             repeatMode = RepeatMode.Restart
         ), label = ""
     )
-
     val pulseAlpha by infiniteTransition.animateFloat(
         initialValue = 0.3f,
         targetValue = 0.8f,
@@ -47,6 +52,14 @@ fun NFCCheckScreen() {
             repeatMode = RepeatMode.Reverse
         ), label = ""
     )
+    activity.setNfcListener { data -> Log.d("NFC_DATA",data)}
+
+    DisposableEffect(Unit) {
+        NFCUtil.enableNfcForegroundDispatch(activity)
+        onDispose {
+            NFCUtil.disableNfcForegroundDispatch(activity) // 退出页面时执行
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -141,8 +154,3 @@ fun NFCCheckScreen() {
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewNFCCheckScreen() {
-    NFCCheckScreen()
-}
