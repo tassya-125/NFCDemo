@@ -53,13 +53,12 @@ fun NFCCheckScreen(activity: MainActivity) {
         ), label = ""
     )
     activity.setNfcListener { data -> Log.d("NFC_DATA",data)}
-
-    DisposableEffect(Unit) {
-        NFCUtil.enableNfcForegroundDispatch(activity)
-        onDispose {
-            NFCUtil.disableNfcForegroundDispatch(activity) // 退出页面时执行
-        }
-    }
+    NFCUtil.enableNfcForegroundDispatch(activity)
+//    DisposableEffect(Unit) {
+//        onDispose {
+//            NFCUtil.disableNfcForegroundDispatch(activity) // 退出页面时执行
+//        }
+//    }
 
     Box(
         modifier = Modifier

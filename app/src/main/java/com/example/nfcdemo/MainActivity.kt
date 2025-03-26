@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import com.example.nfcdemo.compose.screen.AppNavigation
 import com.example.nfcdemo.util.NFCUtil
 import com.example.nfcdemo.util.NFCUtil.readNfcData
+import com.example.nfcdemo.util.ToastUtil
 
 
 class MainActivity : AppCompatActivity() {
@@ -46,7 +47,8 @@ class MainActivity : AppCompatActivity() {
                 nfcListener?.invoke(data) // 通过回调传递数据
             }
         }else{
-            Log.d(TAG, "tag is null")
+            ToastUtil.show(this,"NFC不符合格式",ToastUtil.ERROR)
+            Log.e(TAG, "Tag is null. Intent extras: ${intent.extras}")
         }
     }
 

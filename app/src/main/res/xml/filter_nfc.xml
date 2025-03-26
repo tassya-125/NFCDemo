@@ -7,6 +7,17 @@
 
     <tech-list>
         <tech>android.nfc.tech.NfcB</tech>
+        <tech>android.nfc.tech.IsoDep</tech>
+    </tech-list>
+
+    <tech-list>
+        <tech>android.nfc.tech.Ndef</tech>
+        <tech>android.nfc.tech.NdefFormatable</tech>
+    </tech-list>
+
+
+    <tech-list>
+        <tech>android.nfc.tech.NfcB</tech>
     </tech-list>
     <tech-list>
         <tech>android.nfc.tech.NfcF</tech>

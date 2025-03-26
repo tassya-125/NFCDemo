@@ -51,6 +51,8 @@ android {
 }
 
 dependencies {
+    implementation (libs.androidx.material.icons.core)
+    implementation (libs.androidx.material.icons.extended)
     implementation (libs.mmkv)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.retrofit)

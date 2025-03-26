@@ -34,9 +34,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -87,7 +86,7 @@ fun ProductStatus(
                 )
 
                 false -> StatusIndicator(
-                    icon = Icons.Default.Warning,
+                    icon = Icons.Default.Error,
                     color = FakeColor,
                     label = "检测异常"
                 )
