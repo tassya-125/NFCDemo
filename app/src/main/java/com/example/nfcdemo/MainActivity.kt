@@ -1,14 +1,12 @@
 package com.example.nfcdemo
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.example.nfcdemo.compose.screen.AppNavigation
 import com.example.nfcdemo.util.NFCUtil
 import com.example.nfcdemo.util.NFCUtil.readNfcData

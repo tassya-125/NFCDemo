@@ -32,6 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.example.nfcdemo.R
+import com.example.nfcdemo.util.OSSUtil
+import com.example.nfcdemo.util.ToastUtil
+import kotlinx.coroutines.launch
 
 
 @Preview
@@ -46,14 +49,40 @@ fun UserProfileScreen() {
     val (username, setUsername) = remember { mutableStateOf("John Doe") }
     val (phoneNumber, setPhoneNumber) = remember { mutableStateOf("+1 234 567 890") }
     val (email, setEmail) = remember { mutableStateOf("johndoe@example.com") }
+    var isUploading by remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()  // 获取协程作用域
+
+
+    fun uploadImage(context: Context, uri: Uri) {
+        isUploading = true  // 开始上传时显示上传状态
+        coroutineScope.launch {
+            val uploadedUrl = OSSUtil.uploadImageToOss(uri, context)  // 调用上传工具类
+            if (uploadedUrl != null) {
+                avatarUri = Uri.parse(uploadedUrl) // 更新头像为已上传的图片 URL
+            }else{
+                ToastUtil.show(context,"修改失败",ToastUtil.ERROR)
+            }
+            isUploading = false
+        }
+    }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? -> uri?.let { avatarUri = it } }
+    ) { uri: Uri? ->
+        uri?.let {
+            uploadImage(context, it)
+        }  // 上传图片到 OSS
+    }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap: Bitmap? -> bitmap?.let { avatarUri = saveImageToGallery(context, it) } }
+    ) { bitmap: Bitmap? ->
+        bitmap?.let {
+            val savedUri = saveImageToGallery(context, it)
+            savedUri?.let { uploadImage(context, it) }  // 保存并上传
+        }
+    }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -100,7 +129,8 @@ fun UserProfileScreen() {
             // 头像部分
             ProfileAvatarSection(
                 avatarUri = avatarUri,
-                onEditClick = { checkPermissions() }
+                onEditClick = { checkPermissions() },
+                isUploading = isUploading
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -109,8 +139,8 @@ fun UserProfileScreen() {
             ProfileInfoCard(
                 isEditing = isEditing,
                 username = username,
-                phoneNumber = phoneNumber,
-                email = email,
+                phoneNumber = phoneNumber?:"",
+                email = email?:"",
                 onUsernameChange = setUsername,
                 onPhoneChange = setPhoneNumber,
                 onEmailChange = setEmail,
@@ -132,7 +162,8 @@ fun UserProfileScreen() {
 @Composable
 private fun ProfileAvatarSection(
     avatarUri: Uri?,
-    onEditClick: () -> Unit
+    onEditClick: () -> Unit,
+    isUploading: Boolean
 ) {
     Box(
         contentAlignment = Alignment.BottomEnd,
@@ -146,7 +177,12 @@ private fun ProfileAvatarSection(
                 .fillMaxSize()
                 .clickable(onClick = onEditClick)
         ) {
-            if (avatarUri != null) {
+            if (isUploading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            } else if (avatarUri != null) {
                 AsyncImage(
                     model = avatarUri,
                     contentDescription = stringResource(R.string.profile_avatar_desc),
@@ -164,25 +200,9 @@ private fun ProfileAvatarSection(
                 )
             }
         }
-
-        // 编辑按钮
-        IconButton(
-            onClick = onEditClick,
-            modifier = Modifier
-                .size(48.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = CircleShape
-                )
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Edit,
-                contentDescription = stringResource(R.string.edit_avatar),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-        }
     }
 }
+
 
 @Composable
 private fun ProfileInfoCard(
