@@ -1,11 +1,14 @@
 package com.example.nfcdemo.util
 
+import android.util.Log
 import com.example.nfcdemo.model.User
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
 
 object UserManager {
     private val mmkv by lazy { MMKV.defaultMMKV() }
+
+    private val TAG = "USER"
 
     // 保存用户数据
     fun saveUser(user: User, token: String) {
@@ -15,9 +18,11 @@ object UserManager {
 
     // 获取当前用户
     fun getCurrentUser(): User? {
-        return mmkv.decodeString("user_json")?.let {
+       val user=  mmkv.decodeString("user_json")?.let {
             Gson().fromJson(it, User::class.java)
         }
+        Log.d(TAG,user.toString())
+        return user;
     }
 
     // 获取认证 token

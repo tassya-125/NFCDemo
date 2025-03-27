@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.nfcdemo.model.User
 import com.example.nfcdemo.network.data.response.AuthResponse
 import com.example.nfcdemo.network.repository.AuthRepository
+import com.example.nfcdemo.util.UserManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -37,6 +38,7 @@ class AuthViewModel(
             action = { repository.login(identifier, password) },
             successHandler = { response ->
                 validateAuthResponse(response)?.let { (user, token) ->
+                    UserManager.saveUser(user,token)
                     AuthState.LoginSuccess(user, token)
                 } ?: AuthState.Error("Invalid registration data", OperationType.LOGIN)
             }

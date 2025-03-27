@@ -32,25 +32,26 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.example.nfcdemo.R
+import com.example.nfcdemo.model.User
 import com.example.nfcdemo.util.OSSUtil
 import com.example.nfcdemo.util.ToastUtil
+import com.example.nfcdemo.util.UserManager
 import kotlinx.coroutines.launch
 
 
-@Preview
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileScreen() {
     val context = LocalContext.current
-    var avatarUri by remember { mutableStateOf<Uri?>(null) }
     var showImageSourceDialog by remember { mutableStateOf(false) }
     var isEditing by remember { mutableStateOf(false) }
-
-    val (username, setUsername) = remember { mutableStateOf("John Doe") }
-    val (phoneNumber, setPhoneNumber) = remember { mutableStateOf("+1 234 567 890") }
-    val (email, setEmail) = remember { mutableStateOf("johndoe@example.com") }
+    val user : User = UserManager.getCurrentUser()!!
+    val (username, setUsername) = remember { mutableStateOf(user.username) }
+    val (phoneNumber, setPhoneNumber) = remember { mutableStateOf(user.phoneNumber) }
+    val (email, setEmail) = remember { mutableStateOf(user.email) }
+    var avatarUri by remember { mutableStateOf<Uri?>( user.image?.let{ Uri.parse(it) } ?:null) }
     var isUploading by remember { mutableStateOf(false) }
-
     val coroutineScope = rememberCoroutineScope()  // 获取协程作用域
 
 
@@ -72,7 +73,7 @@ fun UserProfileScreen() {
     ) { uri: Uri? ->
         uri?.let {
             uploadImage(context, it)
-        }  // 上传图片到 OSS
+        }
     }
 
     val cameraLauncher = rememberLauncherForActivityResult(
@@ -411,11 +412,10 @@ private fun InfoListItem(
 private fun ImageSourceSelectionDialog(
     onDismiss: () -> Unit,
     onGallerySelect: () -> Unit,
-    onCameraSelect: () -> Unit
+    onCameraSelect: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-
         icon = { Icon(Icons.Default.CheckCircle, null) },
         title = { Text(stringResource(R.string.choose_image_source)) },
         text = { Text(stringResource(R.string.select_image_source_prompt)) },
