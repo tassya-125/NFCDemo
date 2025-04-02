@@ -60,6 +60,7 @@ fun UserProfileScreen() {
             val uploadedUrl = OSSUtil.uploadImageToOss(uri, context)  // 调用上传工具类
             if (uploadedUrl != null) {
                 avatarUri = Uri.parse(uploadedUrl) // 更新头像为已上传的图片 URL
+
             }else{
                 ToastUtil.show(context,"修改失败",ToastUtil.ERROR)
             }
