@@ -48,9 +48,10 @@ class AuthViewModel(
     fun register(identifier: String, password: String, code: String,isUsingPhone :Boolean) {
         executeAuthOperation(
             operationType = OperationType.REGISTER,
-            action = { repository.register(identifier, password, code) },
+            action = { repository.register(identifier, password, code,isUsingPhone) },
             successHandler = { response ->
                 validateAuthResponse(response)?.let { (user, token) ->
+                    UserManager.saveUser(user,token)
                     AuthState.RegisterSuccess(user, token)
                 } ?: AuthState.Error("Invalid registration data", OperationType.REGISTER)
             }

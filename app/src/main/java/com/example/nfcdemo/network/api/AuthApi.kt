@@ -13,7 +13,7 @@ interface AuthApi {
     @POST("generator/user/login")
     suspend fun login(@Body request: LoginRequest): Response<AuthResponse>
 
-    @POST("auth/register")
+    @POST("generator/user/register")
     suspend fun register(@Body request: RegisterRequest): Response<AuthResponse>
 
     @POST("auth/send-verification-code")

@@ -27,7 +27,7 @@ import com.example.nfcdemo.viewmodel.AuthViewModel
 
 @Composable
 fun LoginRegisterScreen(onLoginSuccess: () -> Unit) {
-    var authViewModel : AuthViewModel = viewModel()
+    val authViewModel : AuthViewModel = viewModel()
     val authState by authViewModel.authState.collectAsState()
     var identifier  by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -37,10 +37,11 @@ fun LoginRegisterScreen(onLoginSuccess: () -> Unit) {
 
     LaunchedEffect(authState) {
         when (authState) {
-            is AuthViewModel.AuthState.LoginSuccess -> {
+            is AuthViewModel.AuthState.LoginSuccess,
+            is AuthViewModel.AuthState.RegisterSuccess -> {
                 onLoginSuccess()
             }
-            else -> {
+            else  -> {
             }
         }
     }
@@ -104,7 +105,6 @@ fun LoginRegisterScreen(onLoginSuccess: () -> Unit) {
                         authViewModel.register(identifier,password,code,isUsingPhone)
                     }
                     Log.e("auth","status : ${authViewModel.authState.value}")
-
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3))

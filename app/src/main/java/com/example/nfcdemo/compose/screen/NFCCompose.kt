@@ -1,6 +1,5 @@
 package com.example.nfcdemo.compose.screen
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -17,7 +16,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Canvas
@@ -25,16 +23,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.example.nfcdemo.MainActivity
 import com.example.nfcdemo.R
 import com.example.nfcdemo.compose.components.LoadingIndicator
+import com.example.nfcdemo.model.PotteryEntity
 import com.example.nfcdemo.util.NFCUtil
-import kotlin.math.log
 
 @Composable
-fun NFCCheckScreen(activity: MainActivity) {
+fun NFCCheckScreen(activity: MainActivity,setPottery:(PotteryEntity?)->Unit) {
     val infiniteTransition = rememberInfiniteTransition(label = "")
     val rotation by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -52,11 +49,18 @@ fun NFCCheckScreen(activity: MainActivity) {
             repeatMode = RepeatMode.Reverse
         ), label = ""
     )
-    activity.setNfcListener { data -> Log.d("NFC_DATA",data)}
+    activity.setNfcListener { uid
+        ->
+        Log.d("NFC_DATA", uid)
+        // TODO 发送请求到后端获取pottery数据
+        val pottery:PotteryEntity? =  null
+        setPottery(pottery)
+    }
     NFCUtil.enableNfcForegroundDispatch(activity)
 //    DisposableEffect(Unit) {
+//
 //        onDispose {
-//            NFCUtil.disableNfcForegroundDispatch(activity) // 退出页面时执行
+////            NFCUtil.disableNfcForegroundDispatch(activity) // 退出页面时执行
 //        }
 //    }
 

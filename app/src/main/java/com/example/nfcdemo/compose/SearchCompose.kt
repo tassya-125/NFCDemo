@@ -1,7 +1,6 @@
 package com.example.nfcdemo.compose
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,7 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -23,14 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// 定义颜色常量
-private val PrimaryBlue = Color(0xFF2196F3)
-private val LightBlue = Color(0xFFE3F2FD)
-private val DarkRed = Color(0xFFD32F2F)
-private val CardBackground = Color(0xFFF5F5F5)
-private val GradientStart = Color(0xFF42A5F5)
-private val GradientEnd = Color(0xFF1976D2)
-
 @Preview(showBackground = true)
 @Composable
 fun SearchScreen() {
@@ -38,24 +29,22 @@ fun SearchScreen() {
     val items = listOf(
         Item("Premium Watch", null, true),
         Item("Designer Bag", null, false),
+        Item("Designer Bag", null, false),
         Item("Smartphone X", null, true)
     )
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(LightBlue)
-            .padding(horizontal = 16.dp)
+            .background(Brush.verticalGradient(listOf(Color(0xFFEEEEEE), Color(0xFFBDBDBD))))
     ) {
-        // 搜索栏
-        SearchBarSection(query, onQueryChange = { query = it })
+        SearchBar(query, onQueryChange = { query = it })
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 物品列表
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxSize()
         ) {
             items(items) { item ->
                 ProductCard(item)
@@ -64,13 +53,12 @@ fun SearchScreen() {
     }
 }
 
-
 @Composable
-private fun SearchBarSection(query: String, onQueryChange: (String) -> Unit) {
+fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 2.dp),
+            .padding(top = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         OutlinedTextField(
@@ -78,30 +66,27 @@ private fun SearchBarSection(query: String, onQueryChange: (String) -> Unit) {
             onValueChange = onQueryChange,
             modifier = Modifier
                 .weight(1f)
-                .shadow(2.dp, RoundedCornerShape(16.dp)),
+                .clip(RoundedCornerShape(24.dp)),
             placeholder = { Text("Search products...", color = Color.Gray) },
             leadingIcon = {
                 Icon(
                     Icons.Default.Search,
                     contentDescription = null,
-                    tint = PrimaryBlue
+                    tint = Color(0xFF1976D2)
                 )
             },
-            shape = RoundedCornerShape(16.dp)
+            shape = RoundedCornerShape(24.dp)
         )
 
         Spacer(modifier = Modifier.width(12.dp))
 
         Button(
-            onClick = { /* 执行搜索 */ },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = PrimaryBlue,
-                contentColor = Color.White
-            ),
+            onClick = {},
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)),
+            contentPadding = PaddingValues(0.dp),
             modifier = Modifier
                 .size(56.dp)
                 .clip(CircleShape)
-                .shadow(4.dp, CircleShape)
         ) {
             Icon(
                 imageVector = Icons.Default.Search,
@@ -113,13 +98,14 @@ private fun SearchBarSection(query: String, onQueryChange: (String) -> Unit) {
 }
 
 @Composable
-private fun ProductCard(item: Item) {
+fun ProductCard(item: Item) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(4.dp, RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        shape = RoundedCornerShape(16.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Brush.verticalGradient(listOf(Color.White, Color(0xFFE3F2FD))))
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Row(
             modifier = Modifier
@@ -127,12 +113,12 @@ private fun ProductCard(item: Item) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 图片区域
             Box(
                 modifier = Modifier
                     .size(100.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color.LightGray),
+                    .background(Color.LightGray)
+                    .border(2.dp, Color.Gray, RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 if (item.imageRes != null) {
@@ -168,11 +154,11 @@ private fun ProductCard(item: Item) {
 }
 
 @Composable
-private fun AuthenticityBadge(isGenuine: Boolean) {
-    val (text, color, bgColor) = if (isGenuine) {
-        Triple("GENUINE", Color(0xFF1B5E20), Color(0xFFC8E6C9))
+fun AuthenticityBadge(isGenuine: Boolean) {
+    val (text, textColor, bgColor) = if (isGenuine) {
+        Triple("GENUINE", Color(0xFF388E3C), Color(0xFFC8E6C9))
     } else {
-        Triple("FAKE", DarkRed, Color(0xFFFFCDD2))
+        Triple("FAKE", Color(0xFFD32F2F), Color(0xFFFFCDD2))
     }
 
     Box(
@@ -183,7 +169,7 @@ private fun AuthenticityBadge(isGenuine: Boolean) {
     ) {
         Text(
             text = text,
-            color = color,
+            color = textColor,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold
         )

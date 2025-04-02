@@ -45,7 +45,7 @@ object NFCUtil {
                 activity,
                 0,
                 Intent(activity,  activity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
-                PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_MUTABLE
             ),
             null, null
         )
@@ -82,16 +82,9 @@ object NFCUtil {
                     val uid = nfcA.tag.id
                     val uidHex = bytesToHex(uid)
                     Log.d(TAG, "NFC-A UID: $uidHex")
-
-                    // 读取标签的数据（例如读取块数据）
-                    // 读取块 4（MIFARE Classic 标签的一个数据块）
-                    val blockData = nfcA.transceive(byteArrayOf(0x30.toByte(), 0x04.toByte()))
-                    val blockDataHex = bytesToHex(blockData)
-
-                    Log.d(TAG, "Block 4 Data: $blockDataHex")
                     // 关闭连接
                     nfcA.close()
-                    return blockDataHex
+                    return uidHex
                 } catch (e: java.lang.Exception) {
                     Log.e(TAG, "读取 NFC-A 标签数据失败", e)
                 }

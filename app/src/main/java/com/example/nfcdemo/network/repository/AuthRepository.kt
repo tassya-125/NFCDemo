@@ -42,9 +42,9 @@ class AuthRepository {
         }
     }
 
-    suspend fun register(identifier: String, password: String, code: String): Result<AuthResponse> {
+    suspend fun register(identifier: String, password: String, code: String,isUsingPhone:Boolean): Result<AuthResponse> {
         return try {
-            val response = apiService.register(RegisterRequest(identifier, password, code,true))
+            val response = apiService.register(RegisterRequest(identifier, password, code,isUsingPhone))
             if (response.isSuccessful) {
                 Result.success(response.body()!!)
             } else {

@@ -1,46 +1,23 @@
 package com.example.nfcdemo.compose.screen
 
-import android.util.Log
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
+import android.app.Activity
+import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -58,10 +35,8 @@ import com.example.nfcdemo.util.ConstantUtil
 @Preview
 @Composable
 fun MainScreen() {
-
-
     var currentPage by remember { mutableStateOf(ConstantUtil.PAGE_HOME) }
-
+    val activity = LocalContext.current as MainActivity
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
@@ -76,37 +51,34 @@ fun MainScreen() {
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            AnimatedScreenTransition(targetPage = currentPage)
+            AnimatedScreenTransition(targetPage = currentPage,activity)
         }
     }
 }
 
 @Composable
-private fun AnimatedScreenTransition(targetPage: Int) {
-    val activity = LocalContext.current as MainActivity
+private fun AnimatedScreenTransition(targetPage: Int,activity :MainActivity) {
+//
 
     AnimatedContent(
         targetState = targetPage,
         transitionSpec = {
             if (targetState > initialState) {
-                (scaleIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) + fadeIn())
-                    .togetherWith(scaleOut() + fadeOut())
+                slideInHorizontally { it } + fadeIn() togetherWith slideOutHorizontally { -it } + fadeOut()
             } else {
-                (scaleIn(animationSpec = spring(stiffness = Spring.StiffnessLow)) + fadeIn())
-                    .togetherWith(scaleOut() + fadeOut())
+                slideInHorizontally { -it } + fadeIn() togetherWith slideOutHorizontally { it } + fadeOut()
             }.using(SizeTransform(clip = false))
         },
         label = "ScreenTransition"
     ) { page ->
         when (page) {
             ConstantUtil.PAGE_USER -> UserProfileScreen()
-            ConstantUtil.PAGE_HOME -> NFCCheckScreen(activity)
+            ConstantUtil.PAGE_HOME -> NFCApp(activity)
             ConstantUtil.PAGE_SEARCH -> SearchScreen()
         }
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AnimatedNavigationBar(
     currentPage: Int,
@@ -115,26 +87,14 @@ fun AnimatedNavigationBar(
     NavigationBar(
         modifier = Modifier
             .height(72.dp)
-            .clip(MaterialTheme.shapes.medium),
-        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+            .clip(RoundedCornerShape(24.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f)),
         tonalElevation = 8.dp
     ) {
         val items = listOf(
-            NavItem(
-                icon = Icons.Default.Home,
-                label = stringResource(R.string.home),
-                page = ConstantUtil.PAGE_HOME
-            ),
-            NavItem(
-                icon = Icons.Default.Search,
-                label = stringResource(R.string.search),
-                page = ConstantUtil.PAGE_SEARCH
-            ),
-            NavItem(
-                icon = Icons.Default.Person,
-                label = stringResource(R.string.profile),
-                page = ConstantUtil.PAGE_USER
-            )
+            NavItem(Icons.Default.Home, stringResource(R.string.home), ConstantUtil.PAGE_HOME),
+            NavItem(Icons.Default.Search, stringResource(R.string.search), ConstantUtil.PAGE_SEARCH),
+            NavItem(Icons.Default.Person, stringResource(R.string.profile), ConstantUtil.PAGE_USER)
         )
 
         items.forEach { item ->
@@ -142,24 +102,20 @@ fun AnimatedNavigationBar(
                 selected = currentPage == item.page,
                 onClick = { onPageSelected(item.page) },
                 icon = {
-                    AnimatedNavIcon(
-                        icon = item.icon,
-                        isSelected = currentPage == item.page
-                    )
+                    AnimatedNavIcon(icon = item.icon, isSelected = currentPage == item.page)
                 },
                 label = {
                     Text(
                         text = item.label,
                         fontSize = 12.sp,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        softWrap = false
+                        overflow = TextOverflow.Ellipsis
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
-                    selectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 ),
                 alwaysShowLabel = true
             )
@@ -172,34 +128,20 @@ private fun AnimatedNavIcon(
     icon: ImageVector,
     isSelected: Boolean
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+    val scale by animateFloatAsState(targetValue = if (isSelected) 1.2f else 1f, animationSpec = tween(300))
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(48.dp)
+            .graphicsLayer(scaleX = scale, scaleY = scale)
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(if (isSelected) 48.dp else 40.dp)
-                .background(
-                    color = if (isSelected) {
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
-                    } else {
-                        Color.Transparent
-                    },
-                    shape = MaterialTheme.shapes.medium
-                )
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(24.dp),
-                tint = if (isSelected) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                }
-            )
-        }
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(24.dp),
+            tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 

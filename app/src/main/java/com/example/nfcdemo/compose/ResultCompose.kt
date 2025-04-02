@@ -57,7 +57,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ProductStatus(
     isAuthentic: Boolean = true,
-    productInfo: ProductInfo? = null, // 新增产品信息数据类
     onDetailsClick: () -> Unit = {}
 ) {
     val animatedColor by animateColorAsState(
@@ -71,7 +70,7 @@ fun ProductStatus(
             .verticalScroll(rememberScrollState()) // 支持滚动
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.Center
     ) {
         // 状态图标动画
         AnimatedContent(
@@ -93,22 +92,6 @@ fun ProductStatus(
             }
         }
 
-        // 详细信息卡片
-        AnimatedVisibility(
-            visible = productInfo != null,
-            enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically()
-        ) {
-            productInfo?.let {
-                ProductInfoCard(
-                    info = it,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(onClick = onDetailsClick)
-                        .animateContentSize()
-                )
-            }
-        }
 
         // 操作按钮
         OutlinedButton(

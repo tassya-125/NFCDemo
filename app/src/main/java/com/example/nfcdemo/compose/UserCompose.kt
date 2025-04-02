@@ -9,7 +9,6 @@ import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -23,11 +22,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
@@ -50,7 +49,7 @@ fun UserProfileScreen() {
     val (username, setUsername) = remember { mutableStateOf(user.username) }
     val (phoneNumber, setPhoneNumber) = remember { mutableStateOf(user.phoneNumber) }
     val (email, setEmail) = remember { mutableStateOf(user.email) }
-    var avatarUri by remember { mutableStateOf<Uri?>( user.image?.let{ Uri.parse(it) } ?:null) }
+    var avatarUri by remember { mutableStateOf<Uri?>( user.image?.let{ Uri.parse(it) } ) }
     var isUploading by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()  // 获取协程作用域
 
@@ -415,6 +414,7 @@ private fun ImageSourceSelectionDialog(
     onCameraSelect: () -> Unit,
 ) {
     AlertDialog(
+        shape = RectangleShape,
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Default.CheckCircle, null) },
         title = { Text(stringResource(R.string.choose_image_source)) },
