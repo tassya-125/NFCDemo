@@ -8,12 +8,14 @@ import com.example.nfcdemo.MainActivity
 import com.example.nfcdemo.compose.PotteryDetailScreen
 import com.example.nfcdemo.compose.ProductStatus
 import com.example.nfcdemo.model.PotteryEntity
+import com.example.nfcdemo.network.data.response.PotteryResponse
 import com.example.nfcdemo.util.ConstantUtil
+import com.example.nfcdemo.util.ToastUtil
 
 @Composable
 fun NFCApp(activity: MainActivity) {
     val navController = rememberNavController()
-    var pottery:PotteryEntity?=null
+    var pottery: PotteryEntity?=null
     var isAuthentic :Boolean= false
 
     NavHost(navController = navController, startDestination = ConstantUtil.Screen.NFC_CHECK.route) {
@@ -33,6 +35,10 @@ fun NFCApp(activity: MainActivity) {
         }
         composable(ConstantUtil.Screen.Result.route) {
             ProductStatus(isAuthentic){
+                if(!isAuthentic){
+                    ToastUtil.show(activity,"假的,无法查看详细信息",ToastUtil.ERROR)
+                    return@ProductStatus
+                }
                 navController.navigate(ConstantUtil.Screen.Detail.route) {
                     popUpTo(ConstantUtil.Screen.Result.route) {
                         inclusive = true

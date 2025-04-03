@@ -24,11 +24,15 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.lifecycleScope
 import com.example.nfcdemo.MainActivity
 import com.example.nfcdemo.R
 import com.example.nfcdemo.compose.components.LoadingIndicator
 import com.example.nfcdemo.model.PotteryEntity
+import com.example.nfcdemo.network.data.response.PotteryResponse
+import com.example.nfcdemo.network.repository.PotteryRepository
 import com.example.nfcdemo.util.NFCUtil
+import kotlinx.coroutines.launch
 
 @Composable
 fun NFCCheckScreen(activity: MainActivity,setPottery:(PotteryEntity?)->Unit) {
@@ -53,8 +57,19 @@ fun NFCCheckScreen(activity: MainActivity,setPottery:(PotteryEntity?)->Unit) {
         ->
         Log.d("NFC_DATA", uid)
         // TODO 发送请求到后端获取pottery数据
-        val pottery:PotteryEntity? =  null
-        setPottery(pottery)
+        activity.lifecycleScope.launch {
+             PotteryRepository.getInfo(uid).fold(
+                 onSuccess ={data->
+                     Log.d("NFC_DATA",data.toString())
+                     setPottery(data.pottery)
+                 },
+                 onFailure = {
+                     Log.e("NFC_DATA","没有检测到")
+                     setPottery(null)
+                 }
+             )
+
+        }
     }
     NFCUtil.enableNfcForegroundDispatch(activity)
 //    DisposableEffect(Unit) {

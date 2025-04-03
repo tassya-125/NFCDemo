@@ -1,5 +1,6 @@
 package com.example.nfcdemo.compose
 
+import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,24 +22,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import coil.compose.AsyncImage
+import com.example.nfcdemo.network.data.response.VerificationHistoryResponse
+import com.example.nfcdemo.viewmodel.VerificationHistoryViewModel
 
 @Preview(showBackground = true)
 @Composable
 fun SearchScreen() {
     var query by remember { mutableStateOf("") }
-    val items = listOf(
-        Item("Premium Watch", null, true),
-        Item("Designer Bag", null, false),
-        Item("Designer Bag", null, false),
-        Item("Smartphone X", null, true)
-    )
+
+    val viewModel : VerificationHistoryViewModel =  viewModel()
+    val items = viewModel.pager.collectAsLazyPagingItems()
+    items.refresh()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Brush.verticalGradient(listOf(Color(0xFFEEEEEE), Color(0xFFBDBDBD))))
     ) {
-        SearchBar(query, onQueryChange = { query = it })
+        SearchBar(query, onQueryChange = { query = it },viewModel)
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -46,15 +51,23 @@ fun SearchScreen() {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(items) { item ->
-                ProductCard(item)
+            items(items.itemCount) { index ->
+                items[index]?.let { ProductCard(it) }
+            }
+
+            // 加载状态
+            items.apply {
+                when {
+                    loadState.append is LoadState.Loading -> item { CircularProgressIndicator() }
+                    loadState.append is LoadState.Error -> item { Text("加载失败") }
+                }
             }
         }
     }
 }
 
 @Composable
-fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
+fun SearchBar(query: String, onQueryChange: (String) -> Unit,viewModel: VerificationHistoryViewModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,7 +80,7 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
             modifier = Modifier
                 .weight(1f)
                 .clip(RoundedCornerShape(24.dp)),
-            placeholder = { Text("Search products...", color = Color.Gray) },
+            placeholder = { Text("查看验证历史", color = Color.Gray) },
             leadingIcon = {
                 Icon(
                     Icons.Default.Search,
@@ -81,7 +94,7 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
         Spacer(modifier = Modifier.width(12.dp))
 
         Button(
-            onClick = {},
+            onClick = {viewModel.refresh()},
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)),
             contentPadding = PaddingValues(0.dp),
             modifier = Modifier
@@ -98,7 +111,7 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
 }
 
 @Composable
-fun ProductCard(item: Item) {
+fun ProductCard(item: VerificationHistoryResponse) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -121,12 +134,14 @@ fun ProductCard(item: Item) {
                     .border(2.dp, Color.Gray, RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                if (item.imageRes != null) {
-                    Image(
-                        painter = painterResource(id = item.imageRes),
-                        contentDescription = null,
+                if (item.pottery?.imageUrl != null) {
+                    AsyncImage(
+                        model = Uri.parse(item.pottery.imageUrl),
+                        contentDescription = "紫砂壶图片",
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .size(240.dp)
+                            .clip(RoundedCornerShape(12.dp))
                     )
                 } else {
                     Text(
@@ -141,13 +156,13 @@ fun ProductCard(item: Item) {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = item.name,
+                    text = item.pottery?.potteryName?:"无",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Black
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                AuthenticityBadge(isGenuine = item.isGenuine)
+                AuthenticityBadge(isGenuine = item.verificationResult)
             }
         }
     }
@@ -176,4 +191,3 @@ fun AuthenticityBadge(isGenuine: Boolean) {
     }
 }
 
-data class Item(val name: String, val imageRes: Int?, val isGenuine: Boolean)

@@ -6,6 +6,7 @@ import com.example.nfcdemo.network.data.request.CodeRequest
 import com.example.nfcdemo.network.data.request.LoginRequest
 import com.example.nfcdemo.network.data.request.RegisterRequest
 import com.example.nfcdemo.network.data.response.AuthResponse
+import com.example.nfcdemo.util.NetworkUtil.parseError
 import okhttp3.ResponseBody
 
 class AuthRepository {
@@ -31,16 +32,7 @@ class AuthRepository {
         }
     }
 
-    private fun parseError(code: Int, errorBody: ResponseBody?): String {
-        return when (code) {
-            400 -> "Invalid request format"
-            401 -> "Authentication failed"
-            403 -> "Access denied"
-            404 -> "Resource not found"
-            500 -> "Internal server error"
-            else -> errorBody?.string() ?: "Unknown error (code $code)"
-        }
-    }
+
 
     suspend fun register(identifier: String, password: String, code: String,isUsingPhone:Boolean): Result<AuthResponse> {
         return try {

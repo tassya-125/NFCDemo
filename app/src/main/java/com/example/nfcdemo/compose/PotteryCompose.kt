@@ -2,6 +2,7 @@ package com.example.nfcdemo.compose
 
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +12,10 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,6 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.nfcdemo.model.PotteryEntity
+import com.example.nfcdemo.network.data.response.PotteryResponse
+import com.example.nfcdemo.util.StringUtil
+import com.example.nfcdemo.util.TimeUtil
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -30,6 +38,9 @@ fun PotteryDetailScreen(
     pottery: PotteryEntity,
     modifier: Modifier = Modifier
 ) {
+
+    var avatarUri by remember { mutableStateOf<Uri?>( pottery.imageUrl?.let{ Uri.parse(it) } ) }
+
     Card(
         modifier = modifier
             .padding(16.dp)
@@ -43,7 +54,7 @@ fun PotteryDetailScreen(
         ) {
             // 紫砂壶图片
             AsyncImage(
-                model = pottery.imageUrl,
+                model = avatarUri,
                 contentDescription = "紫砂壶图片",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -69,14 +80,14 @@ fun PotteryDetailScreen(
                 InfoRow(
                     icon = Icons.Default.LocationOn,
                     title = "产地",
-                    content = pottery.origin ?: "未记录"
+                    content = pottery.origin?.let{StringUtil.getOriginValue(it)} ?: "未记录"
                 )
 
                 // 制作时间
                 InfoRow(
                     icon = Icons.Default.DateRange,
                     title = "制作时间",
-                    content = pottery.productionTime?.format() ?: "年代未知"
+                    content = pottery.productionTime?.let{ TimeUtil.formatDate(it)} ?: "年代未知"
                 )
 
                 // 工艺标题
@@ -151,7 +162,7 @@ fun PreviewPotteryDetailScreen() {
                 uid = "1",
                 creator = "顾景舟",
                 origin = "江苏宜兴",
-                productionTime = SimpleDateFormat("yyyy-MM").parse("1985-05"),
+                productionTime = SimpleDateFormat("yyyy-MM").parse("1985-05").toString(),
                 craftsmanshipProcess = "采用传统拍打成型工艺，历经选料、陈腐、成型、烧制等32道工序。泥料选用上等紫泥，经三年以上陈腐，窑温控制精准，呈现独特紫茄色泽。",
                 imageUrl = "https://example.com/zisha-pot"
             )
