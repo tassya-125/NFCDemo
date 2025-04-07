@@ -19,7 +19,7 @@ class VerificationHistoryPagingSource: PagingSource<Int, VerificationHistoryResp
             val page = params.key ?: 1 // 当前页码，默认 1
             val queryParams :MutableMap<String,String> = mapOf(
                 "page" to page.toString(),
-                "pageSize" to "10",
+                "limit" to "10",
             ) .toMutableMap()
 
             UserManager.getUserId()?.let{
@@ -34,7 +34,7 @@ class VerificationHistoryPagingSource: PagingSource<Int, VerificationHistoryResp
                 LoadResult.Page(
                     data = data,
                     prevKey = if (page == 1) null else page - 1,
-                    nextKey = if (data.isEmpty()) null else page + 1
+                    nextKey = if (data.size<10) null else page + 1
                 )
             } else {
                 Log.e(TAG,"Network error")

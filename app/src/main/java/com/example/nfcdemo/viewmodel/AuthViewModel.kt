@@ -16,17 +16,20 @@ class AuthViewModel(
     private val repository: AuthRepository = AuthRepository()
 ) : ViewModel() {
 
+    private val TAG = "USER_NET"
+
     sealed class AuthState {
         object Idle : AuthState()
         object Loading : AuthState()
         data class LoginSuccess(val user:User,val token: String) : AuthState()
         data class RegisterSuccess(val user: User, val token: String) : AuthState()
+        class SaveSuccess:AuthState()
         object CodeSentSuccess : AuthState()
         data class Error(val message: String, val type: OperationType) : AuthState()
     }
 
     enum class OperationType {
-        LOGIN, REGISTER, SEND_CODE
+        LOGIN, REGISTER, SEND_CODE,SAVE
     }
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
@@ -54,6 +57,19 @@ class AuthViewModel(
                     UserManager.saveUser(user,token)
                     AuthState.RegisterSuccess(user, token)
                 } ?: AuthState.Error("Invalid registration data", OperationType.REGISTER)
+            }
+        )
+    }
+
+    fun  save(user: User){
+        executeAuthOperation(
+            operationType = OperationType.SAVE,
+            action = { repository.save(user) },
+            successHandler = { response ->
+                 response?.let {
+                    Log.d(TAG,"success")
+                    AuthState.SaveSuccess()
+                } ?: AuthState.Error("Invalid registration data", OperationType.SAVE)
             }
         )
     }
@@ -114,6 +130,7 @@ class AuthViewModel(
                 OperationType.LOGIN -> "登录失败"
                 OperationType.REGISTER -> "注册失败"
                 OperationType.SEND_CODE -> "验证码发送失败"
+                OperationType.SAVE -> "用户信息更新失败"
             }
         }
     }

@@ -71,13 +71,6 @@ fun NFCCheckScreen(activity: MainActivity,setPottery:(PotteryEntity?)->Unit) {
 
         }
     }
-    NFCUtil.enableNfcForegroundDispatch(activity)
-//    DisposableEffect(Unit) {
-//
-//        onDispose {
-////            NFCUtil.disableNfcForegroundDispatch(activity) // 退出页面时执行
-//        }
-//    }
 
     Box(
         modifier = Modifier

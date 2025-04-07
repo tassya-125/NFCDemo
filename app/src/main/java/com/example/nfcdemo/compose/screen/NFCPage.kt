@@ -1,22 +1,28 @@
 package com.example.nfcdemo.compose.screen
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.nfcdemo.MainActivity
-import com.example.nfcdemo.compose.PotteryDetailScreen
-import com.example.nfcdemo.compose.ProductStatus
 import com.example.nfcdemo.model.PotteryEntity
-import com.example.nfcdemo.network.data.response.PotteryResponse
 import com.example.nfcdemo.util.ConstantUtil
+import com.example.nfcdemo.util.NFCUtil
 import com.example.nfcdemo.util.ToastUtil
 
 @Composable
 fun NFCApp(activity: MainActivity) {
     val navController = rememberNavController()
     var pottery: PotteryEntity?=null
-    var isAuthentic :Boolean= false
+    var isAuthentic = false
+
+    DisposableEffect(Unit) {
+        NFCUtil.enableNfcForegroundDispatch(activity)
+        onDispose {
+            NFCUtil.disableNfcForegroundDispatch(activity) // 退出页面时执行
+        }
+    }
 
     NavHost(navController = navController, startDestination = ConstantUtil.Screen.NFC_CHECK.route) {
         composable(ConstantUtil.Screen.NFC_CHECK.route) {

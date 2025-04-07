@@ -1,13 +1,13 @@
-package com.example.nfcdemo.compose
+package com.example.nfcdemo.compose.screen
 
 
-import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Label
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
@@ -21,12 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.nfcdemo.model.PotteryEntity
-import com.example.nfcdemo.network.data.response.PotteryResponse
 import com.example.nfcdemo.util.StringUtil
 import com.example.nfcdemo.util.TimeUtil
 import java.text.SimpleDateFormat
@@ -69,6 +67,12 @@ fun PotteryDetailScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+
+                InfoRow(
+                    icon = Icons.Default.Label,
+                    title = "名称",
+                    content = pottery.potteryName ?: "未知"
+                )
                 // 作者信息
                 InfoRow(
                     icon = Icons.Default.Person,
@@ -152,23 +156,7 @@ fun Date?.format(): String {
     return SimpleDateFormat("yyyy年MM月", Locale.CHINA).format(this)
 }
 
-@SuppressLint("SimpleDateFormat")
-@Preview
-@Composable
-fun PreviewPotteryDetailScreen() {
-    MaterialTheme {
-        PotteryDetailScreen(
-            pottery = PotteryEntity(
-                uid = "1",
-                creator = "顾景舟",
-                origin = "江苏宜兴",
-                productionTime = SimpleDateFormat("yyyy-MM").parse("1985-05").toString(),
-                craftsmanshipProcess = "采用传统拍打成型工艺，历经选料、陈腐、成型、烧制等32道工序。泥料选用上等紫泥，经三年以上陈腐，窑温控制精准，呈现独特紫茄色泽。",
-                imageUrl = "https://example.com/zisha-pot"
-            )
-        )
-    }
-}
+
 
 
 

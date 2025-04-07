@@ -10,7 +10,7 @@ object PotteryRepository {
 
     private val potteryService = RetrofitClient.instance.create(PotteryApi::class.java)
 
-    private val TAG ="POTTERY_NET"
+    private val TAG ="POTTERY"
 
     suspend fun getInfo(uid:String):Result<PotteryResponse>{
        return try{

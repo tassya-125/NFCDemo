@@ -5,6 +5,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -25,8 +26,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import coil.compose.AsyncImage
 import com.example.nfcdemo.network.data.response.VerificationHistoryResponse
+import com.example.nfcdemo.util.TimeUtil
 import com.example.nfcdemo.viewmodel.VerificationHistoryViewModel
 
 @Preview(showBackground = true)
@@ -36,7 +40,6 @@ fun SearchScreen() {
 
     val viewModel : VerificationHistoryViewModel =  viewModel()
     val items = viewModel.pager.collectAsLazyPagingItems()
-    items.refresh()
 
     Column(
         modifier = Modifier
@@ -51,7 +54,9 @@ fun SearchScreen() {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(items.itemCount) { index ->
+            items( count = items.itemCount,
+                key =items.itemKey { it.id }
+            ) { index ->
                 items[index]?.let { ProductCard(it) }
             }
 
@@ -94,7 +99,7 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit,viewModel: Verifica
         Spacer(modifier = Modifier.width(12.dp))
 
         Button(
-            onClick = {viewModel.refresh()},
+            onClick = {},
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)),
             contentPadding = PaddingValues(0.dp),
             modifier = Modifier
@@ -158,6 +163,20 @@ fun ProductCard(item: VerificationHistoryResponse) {
                 Text(
                     text = item.pottery?.potteryName?:"无",
                     fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "验证人:${item.user?.username?:"无"}",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "验证日期:${TimeUtil.formatDate(item.verificationDate)}",
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Black
                 )

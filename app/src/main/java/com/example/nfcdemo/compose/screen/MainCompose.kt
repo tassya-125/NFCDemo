@@ -1,6 +1,5 @@
 package com.example.nfcdemo.compose.screen
 
-import android.app.Activity
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -16,13 +15,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nfcdemo.MainActivity
@@ -31,10 +28,9 @@ import com.example.nfcdemo.compose.SearchScreen
 import com.example.nfcdemo.compose.UserProfileScreen
 import com.example.nfcdemo.util.ConstantUtil
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
-@Preview
+
 @Composable
-fun MainScreen() {
+fun MainScreen(onLogOut:()->Unit) {
     var currentPage by remember { mutableStateOf(ConstantUtil.PAGE_HOME) }
     val activity = LocalContext.current as MainActivity
     Scaffold(
@@ -51,15 +47,13 @@ fun MainScreen() {
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            AnimatedScreenTransition(targetPage = currentPage,activity)
+            AnimatedScreenTransition(targetPage = currentPage,activity,onLogOut)
         }
     }
 }
 
 @Composable
-private fun AnimatedScreenTransition(targetPage: Int,activity :MainActivity) {
-//
-
+private fun AnimatedScreenTransition(targetPage: Int, activity: MainActivity, onLogOut: () -> Unit) {
     AnimatedContent(
         targetState = targetPage,
         transitionSpec = {
@@ -72,7 +66,7 @@ private fun AnimatedScreenTransition(targetPage: Int,activity :MainActivity) {
         label = "ScreenTransition"
     ) { page ->
         when (page) {
-            ConstantUtil.PAGE_USER -> UserProfileScreen()
+            ConstantUtil.PAGE_USER -> UserProfileScreen(onLogOut)
             ConstantUtil.PAGE_HOME -> NFCApp(activity)
             ConstantUtil.PAGE_SEARCH -> SearchScreen()
         }

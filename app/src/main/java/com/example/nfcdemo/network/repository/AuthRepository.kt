@@ -1,11 +1,13 @@
 package com.example.nfcdemo.network.repository
 
+import com.example.nfcdemo.model.User
 import com.example.nfcdemo.network.RetrofitClient
 import com.example.nfcdemo.network.api.AuthApi
 import com.example.nfcdemo.network.data.request.CodeRequest
 import com.example.nfcdemo.network.data.request.LoginRequest
 import com.example.nfcdemo.network.data.request.RegisterRequest
 import com.example.nfcdemo.network.data.response.AuthResponse
+import com.example.nfcdemo.network.data.response.BaseResponse
 import com.example.nfcdemo.util.NetworkUtil.parseError
 import okhttp3.ResponseBody
 
@@ -32,6 +34,29 @@ class AuthRepository {
         }
     }
 
+
+    suspend fun save(user : User): Result<BaseResponse<Unit>> {
+
+        return  try {
+                val response =apiService.updateUser(user)
+                when {
+                    response.isSuccessful && response.body() != null -> {
+                        Result.success(response.body()!!)
+                    }
+                    response.isSuccessful -> {
+                        Result.failure(Exception("Empty response body"))
+                    }
+                    else -> {
+                        val errorMsg = parseError(response.code(), response.errorBody())
+                        Result.failure(Exception(errorMsg))
+                    }
+                }
+            } catch (e: Exception) {
+                Result.failure(Exception("Network error: ${e.message ?: "Unknown error"}"))
+            }
+
+
+    }
 
 
     suspend fun register(identifier: String, password: String, code: String,isUsingPhone:Boolean): Result<AuthResponse> {

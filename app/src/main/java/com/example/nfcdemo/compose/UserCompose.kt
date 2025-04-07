@@ -29,29 +29,37 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.nfcdemo.R
+import com.example.nfcdemo.compose.components.LogOutConfirmDialog
+import com.example.nfcdemo.compose.components.ResetPasswordDialog
+import com.example.nfcdemo.compose.components.SecurityActionsSection
 import com.example.nfcdemo.model.User
 import com.example.nfcdemo.util.OSSUtil
 import com.example.nfcdemo.util.ToastUtil
 import com.example.nfcdemo.util.UserManager
+import com.example.nfcdemo.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
 
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserProfileScreen() {
+fun UserProfileScreen(onLogOut:()->Unit) {
     val context = LocalContext.current
+    val authViewModel :AuthViewModel = viewModel()
     var showImageSourceDialog by remember { mutableStateOf(false) }
     var isEditing by remember { mutableStateOf(false) }
-    val user : User = UserManager.getCurrentUser()!!
-    val (username, setUsername) = remember { mutableStateOf(user.username) }
-    val (phoneNumber, setPhoneNumber) = remember { mutableStateOf(user.phoneNumber) }
-    val (email, setEmail) = remember { mutableStateOf(user.email) }
-    var avatarUri by remember { mutableStateOf<Uri?>( user.image?.let{ Uri.parse(it) } ) }
+    val user : User? = UserManager.getCurrentUser()
+    var username by remember { mutableStateOf(user?.username) }
+    var phoneNumber by remember { mutableStateOf(user?.phoneNumber) }
+    var email by remember { mutableStateOf(user?.email) }
+    var avatarUri by remember { mutableStateOf<Uri?>( user?.image?.let{ Uri.parse(it) } ) }
     var isUploading by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()  // 获取协程作用域
+    var showResetPasswordDialog by remember { mutableStateOf(false) }
+    var showLogoutConfirmDialog by remember { mutableStateOf(false) }
 
 
     fun uploadImage(context: Context, uri: Uri) {
@@ -60,6 +68,11 @@ fun UserProfileScreen() {
             val uploadedUrl = OSSUtil.uploadImageToOss(uri, context)  // 调用上传工具类
             if (uploadedUrl != null) {
                 avatarUri = Uri.parse(uploadedUrl) // 更新头像为已上传的图片 URL
+                user?.let {
+                    it.image=uploadedUrl
+                    authViewModel.save(it)
+                    ToastUtil.show(context,"修改成功",ToastUtil.SUCCESS)
+                }
             }else{
                 ToastUtil.show(context,"修改失败",ToastUtil.ERROR)
             }
@@ -138,14 +151,65 @@ fun UserProfileScreen() {
             // 信息卡片
             ProfileInfoCard(
                 isEditing = isEditing,
-                username = username,
+                username = username?:"",
                 phoneNumber = phoneNumber?:"",
                 email = email?:"",
-                onUsernameChange = setUsername,
-                onPhoneChange = setPhoneNumber,
-                onEmailChange = setEmail,
-                onEditToggle = { isEditing = !isEditing }
+                onUsernameChange = {newUserName ->
+                    username=newUserName
+                    user?.let{
+                        it.username=newUserName
+                    }
+                },
+                onPhoneChange = { newPhone ->
+                    phoneNumber=newPhone
+                    user?.let {
+                        it.phoneNumber = newPhone
+                    }
+                },
+                onEmailChange = { newEmail ->
+                    email = newEmail
+                    user?.let{
+                        it.email=newEmail
+                    }
+                },
+                onEditToggle = {
+                    isEditing = !isEditing
+                },
+                onSave = {
+                    isEditing = !isEditing
+                    user?.let{
+                        authViewModel.save(it)
+                        ToastUtil.show(context,"修改成功",ToastUtil.SUCCESS)
+                    }
+                }
             )
+
+            Spacer(modifier = Modifier.height(24.dp))
+            SecurityActionsSection(
+                onResetPassword = { showResetPasswordDialog=true },
+                onLogout = { showLogoutConfirmDialog =true}
+            )
+        }
+
+        if (showResetPasswordDialog) {
+            ResetPasswordDialog(
+                onDismiss = { showResetPasswordDialog = false },
+                onConfirm = { newPassword ->
+                    // 调用修改密码API
+                    coroutineScope.launch {
+                        user?.password=newPassword
+                        user?.let{
+                            authViewModel.save(it)
+                            ToastUtil.show(context,"修改成功",ToastUtil.SUCCESS)
+                        }
+                    }
+                }
+            )
+        }
+
+// 退出确认对话框
+        if (showLogoutConfirmDialog) {
+            LogOutConfirmDialog(onDismiss = {showLogoutConfirmDialog = false}, onCancle = {showLogoutConfirmDialog = false},onLogOut)
         }
 
         // 图片来源对话框
@@ -213,7 +277,8 @@ private fun ProfileInfoCard(
     onUsernameChange: (String) -> Unit,
     onPhoneChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
-    onEditToggle: () -> Unit
+    onEditToggle: () -> Unit,
+    onSave: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -237,8 +302,8 @@ private fun ProfileInfoCard(
                     onEmailChange = onEmailChange
                 )
                 ProfileActionButtons(
-                    onSave = onEditToggle,
-                    onCancel = onEditToggle
+                    onSave = onSave,
+                    onCancel =  onEditToggle
                 )
             } else {
                 ProfileInfoDisplay(
@@ -247,7 +312,7 @@ private fun ProfileInfoCard(
                     email = email
                 )
                 Button(
-                    onClick = onEditToggle,
+                    onClick =  onEditToggle ,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(

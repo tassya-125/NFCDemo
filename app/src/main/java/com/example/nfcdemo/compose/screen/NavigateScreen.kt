@@ -29,7 +29,13 @@ fun AppNavigation() {
             )
         }
         composable(ConstantUtil.Screen.Home.route) {
-            MainScreen()
+            MainScreen{
+                navController.navigate(ConstantUtil.Screen.Auth.route) {
+                    popUpTo(ConstantUtil.Screen.Home.route) {
+                        inclusive = true
+                    }
+                }
+            }
         }
     }
 }

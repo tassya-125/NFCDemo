@@ -38,7 +38,7 @@ object UserManager {
     fun isLoggedIn(): Boolean = !getAuthToken().isNullOrEmpty()
 
     fun getUserId():Long?{
-        return USER_CACHE?.id;
+        return getCurrentUser()?.id
     }
 
     // 退出登录
