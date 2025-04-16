@@ -1,6 +1,7 @@
 package com.example.nfcdemo.compose.screen
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,10 +30,14 @@ import com.example.nfcdemo.MainActivity
 import com.example.nfcdemo.R
 import com.example.nfcdemo.compose.components.LoadingIndicator
 import com.example.nfcdemo.model.PotteryEntity
-import com.example.nfcdemo.network.data.response.PotteryResponse
+import com.example.nfcdemo.network.data.request.VerificationHistoryRequest
 import com.example.nfcdemo.network.repository.PotteryRepository
-import com.example.nfcdemo.util.NFCUtil
+import com.example.nfcdemo.network.repository.VerificationRepository
+import com.example.nfcdemo.util.ToastUtil
+import com.example.nfcdemo.util.UserManager
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun NFCCheckScreen(activity: MainActivity,setPottery:(PotteryEntity?)->Unit) {
@@ -53,18 +58,28 @@ fun NFCCheckScreen(activity: MainActivity,setPottery:(PotteryEntity?)->Unit) {
             repeatMode = RepeatMode.Reverse
         ), label = ""
     )
+
+    suspend fun saveVerificationHistory(pottery :PotteryEntity?){
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val verificationRequest =VerificationHistoryRequest(UserManager.getUserId()?:-1,pottery==null, pottery?.uid?:"",
+            LocalDate.now().format(formatter)
+        )
+        VerificationRepository.save(verificationRequest)
+    }
     activity.setNfcListener { uid
         ->
         Log.d("NFC_DATA", uid)
-        // TODO 发送请求到后端获取pottery数据
         activity.lifecycleScope.launch {
+
              PotteryRepository.getInfo(uid).fold(
                  onSuccess ={data->
                      Log.d("NFC_DATA",data.toString())
+                     saveVerificationHistory(data.pottery)
                      setPottery(data.pottery)
                  },
                  onFailure = {
                      Log.e("NFC_DATA","没有检测到")
+                     saveVerificationHistory(null)
                      setPottery(null)
                  }
              )
