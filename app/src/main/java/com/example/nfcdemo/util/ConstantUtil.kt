@@ -7,6 +7,7 @@ object ConstantUtil {
         const val PAGE_USER = 0
         const val PAGE_HOME = 1
         const val PAGE_SEARCH = 2
+        const val PAGE_SALERECORD=3
 
         sealed class Screen(val route: String) {
                 object Auth : Screen("auth")

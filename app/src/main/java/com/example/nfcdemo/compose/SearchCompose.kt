@@ -4,8 +4,6 @@ import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -18,7 +16,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,10 +23,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import coil.compose.AsyncImage
-import com.example.nfcdemo.network.data.response.VerificationHistoryResponse
+import com.example.nfcdemo.model.VerificationHistory
 import com.example.nfcdemo.util.TimeUtil
 import com.example.nfcdemo.viewmodel.VerificationHistoryViewModel
 
@@ -115,13 +111,13 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit,viewModel: Verifica
     }
 }
 
+
 @Composable
-fun ProductCard(item: VerificationHistoryResponse) {
+fun ProductCard(item: VerificationHistory) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(Brush.verticalGradient(listOf(Color.White, Color(0xFFE3F2FD))))
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {

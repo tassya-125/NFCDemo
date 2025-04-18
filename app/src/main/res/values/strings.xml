@@ -19,6 +19,7 @@
     <string name="profile">个人主页</string>
     <string name="reset_password">重置密码</string>
     <string name="logout">退出登录</string>
+    <string name="saleRecord">消费记录</string>
 
 
 </resources>

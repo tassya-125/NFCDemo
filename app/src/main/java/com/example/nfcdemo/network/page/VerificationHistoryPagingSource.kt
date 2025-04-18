@@ -5,15 +5,15 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.nfcdemo.network.RetrofitClient
 import com.example.nfcdemo.network.api.VerificationHistoryApi
-import com.example.nfcdemo.network.data.response.VerificationHistoryResponse
+import com.example.nfcdemo.model.VerificationHistory
 import com.example.nfcdemo.util.UserManager
 
-class VerificationHistoryPagingSource: PagingSource<Int, VerificationHistoryResponse>() {
+class VerificationHistoryPagingSource: PagingSource<Int, VerificationHistory>() {
     private val api = RetrofitClient.instance.create(VerificationHistoryApi::class.java)
 
     private val TAG = "verificationHistory"
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, VerificationHistoryResponse> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, VerificationHistory> {
         Log.d("verification","开始加载数据")
         return try {
             val page = params.key ?: 1 // 当前页码，默认 1
@@ -46,7 +46,7 @@ class VerificationHistoryPagingSource: PagingSource<Int, VerificationHistoryResp
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, VerificationHistoryResponse>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, VerificationHistory>): Int? {
         // 计算刷新时的起始页码（可选实现）
         return state.anchorPosition?.let { anchorPosition ->
             val closestPage = state.closestPageToPosition(anchorPosition)

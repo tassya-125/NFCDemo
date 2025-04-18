@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocalMall
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nfcdemo.MainActivity
 import com.example.nfcdemo.R
+import com.example.nfcdemo.compose.ConsumptionHistoryScreen
 import com.example.nfcdemo.compose.SearchScreen
 import com.example.nfcdemo.compose.UserProfileScreen
 import com.example.nfcdemo.util.ConstantUtil
@@ -68,6 +70,7 @@ private fun AnimatedScreenTransition(targetPage: Int, activity: MainActivity, on
         when (page) {
             ConstantUtil.PAGE_USER -> UserProfileScreen(onLogOut)
             ConstantUtil.PAGE_HOME -> NFCApp(activity)
+            ConstantUtil.PAGE_SALERECORD -> ConsumptionHistoryScreen()
             ConstantUtil.PAGE_SEARCH -> SearchScreen()
         }
     }
@@ -87,6 +90,7 @@ fun AnimatedNavigationBar(
     ) {
         val items = listOf(
             NavItem(Icons.Default.Home, stringResource(R.string.home), ConstantUtil.PAGE_HOME),
+            NavItem(Icons.Default.LocalMall, stringResource(R.string.saleRecord), ConstantUtil.PAGE_SALERECORD),
             NavItem(Icons.Default.Search, stringResource(R.string.search), ConstantUtil.PAGE_SEARCH),
             NavItem(Icons.Default.Person, stringResource(R.string.profile), ConstantUtil.PAGE_USER)
         )
